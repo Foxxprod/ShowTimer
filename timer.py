@@ -43,9 +43,13 @@ class PrompteurTimer(QObject):
     
     def stop(self): #stop complet du timer, remet a zero. 
         #!!!!! faire en sorte que l'interface demande une confirmation avant de faire ca, pour eviter les fausse manip de l'op / script
+        position_actuelle = self.actual_time()  # on sauvegarde avant d'arrêter
         self.timer.stop()
         self.running = False
         self.system_start_hour = None
+        self.last_verified_time = position_actuelle  
+        self.timeline_time = 0    
+
 
     def pause(self): #pause, c'est juste un stop mais on garde en memoire le temps actuel du timer pour pouvoir reprendre ensuite
         if self.running:
@@ -71,6 +75,10 @@ class PrompteurTimer(QObject):
         return self.timeline_time
 
     def on_tick(self):
+
+        if not self.running:
+            return
+
         time_now = self.actual_time()
 
         # temps actuel emis a l'ui

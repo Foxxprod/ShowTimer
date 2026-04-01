@@ -6,6 +6,7 @@ import database, osc
 
 from ui.ui_new_show import Ui_Dialog
 from ui.ui_osc_config import Ui_Dialog as Ui_OSCDialog
+from ui.ui_add_modify_cue import Ui_Dialog as Ui_CueDialog
 
 class CreateShowDialog(QDialog):
     def __init__(self):
@@ -120,3 +121,76 @@ class ModifyOSCConfigDialog(QDialog):
         QMessageBox.information(self, "Config sauvegardée", "La configuration OSC a été mise à jour")
         self.accept()
 
+
+class AddModifyCueDialog(QDialog):
+    def __init__(self, action, show_id=None, cue_id=None):
+        super().__init__()
+        self.ui = Ui_CueDialog()
+        self.ui.setupUi(self)
+        self.setWindowTitle(f"{action} un cue")
+
+        self.action = action
+        self.show_id = show_id
+        self.cue_id = cue_id
+
+        self.ui.abort.clicked.connect(self.reject)
+        self.ui.validate.clicked.connect(self.save_cue)
+
+        if self.action == 'modifier' and cue_id is not None:
+            try:
+                cue = database.db.GetCueById(cue_id)
+                self.ui.cue_title.setText(cue["nom"])
+                self.ui.cue_desc.setText(cue["description"])
+
+                total_sec = cue["temps"] // 1000
+                minutes = total_sec // 60
+                seconds = total_sec % 60
+                self.ui.time.setTime(QTime(0, minutes, seconds))
+
+                self.ui.osc_command.setText(cue["osc_url"])
+                try:
+                    self.ui.osc_args.setValue(int(cue["osc_args"]))
+                except:
+                    self.ui.osc_args.setValue(0)
+                
+                #mettre ici a jour le champs de la couleure du cue 
+
+            except Exception as e:
+                print(f"Erreur lors du chargement du cue pour modification: {e}")
+                QMessageBox.critical(self, "Erreur", "Impossible de charger les données du cue pour modification.")
+                self.reject()
+                return
+        
+    
+    def save_cue(self):
+        name = self.ui.cue_title.text()
+        desc = self.ui.cue_desc.text()
+        time = self.ui.time.time()
+        ms = (time.minute() * 60 + time.second()) * 1000
+        print(f"Temps du cue en ms: {ms}")  # Debug: Affiche le temps converti en millisecondes 
+        osc_command = self.ui.osc_command.text()
+        osc_args = self.ui.osc_args.value()
+
+        if not name or ms == 0 or not osc_command:
+            QMessageBox.warning(self, "Config invalide", "Le nom, le temps et la commande OSC doivent être saisies.")
+            return
+
+        if self.action == 'ajouter':
+            try:
+                database.db.AddCueToShow(database.db.GetActiveShow(), name, desc, ms, osc_command, osc_args, "#161A16")
+                self.accept()
+            except Exception as e:
+                print(f"Erreur lors de l'ajout du cue: {e}")
+                QMessageBox.critical(self, "Erreur", "Impossible d'ajouter le cue à la base de données.")
+                self.reject()
+                return
+            
+        elif self.action == 'modifier':
+            try:
+                database.db.ModifyCue(self.cue_id, name, desc, ms, osc_command, osc_args, "#161A16")
+                self.accept()
+            except Exception as e:
+                print(f"Erreur lors de la modification du cue: {e}")
+                QMessageBox.critical(self, "Erreur", "Impossible de modifier le cue dans la base de données.")
+                self.reject()
+                return

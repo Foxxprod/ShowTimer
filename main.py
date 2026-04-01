@@ -24,10 +24,17 @@ import database, utils, osc
 import sys, threading
 from ui.ui_main import Ui_MainWindow
 from ui.ui_operator import Ui_Dialog as Ui_OperatorDialog
+from prompter import PrompterWindow
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit, QTextEdit, QHBoxLayout, QGridLayout, QMessageBox, QDialog
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import QShortcut, QKeySequence
+from PySide6.QtGui import QIcon
+
+
+
+
 
 
 class MainWindow(QMainWindow):
@@ -35,7 +42,8 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.setWindowTitle("TIMER MANAGER - PCP 2026")
+        self.setWindowTitle("SHOW TIMER - PCP 2026")
+        self.setWindowIcon(QIcon("icon/icon.png"))
 
         self.update_shows_table() #a la première ouverture, on insere les emmision depuis la base de donnée dans le tableau 
         
@@ -145,39 +153,154 @@ class MainWindow(QMainWindow):
     
     def open_show(self):
         if self.selected_show_id is None:
-                QMessageBox.warning(self, "Aucune emmsion sélectionnée", "Veuillez sélectionner une emmsion à ouvrir.")
-                return
+            QMessageBox.warning(self, "Aucune emmsion sélectionnée", "Veuillez sélectionner une emmsion à ouvrir.")
+            return
         
-        database.db.SetActiveShow(self.selected_show_id) #on set l'emmsion selectionné comme emmsion active dans la base de donnée, pour que l'interface de controle puisse recuperer les cues de cette emmsion et les afficher.
-        operator_dialog = OperatorDialog()
+        database.db.SetActiveShow(self.selected_show_id)
+        self.operator_dialog = OperatorDialog()  
         self.hide()
-        operator_dialog.exec()
+        self.operator_dialog.show()
 
     def change_osc_config(self): #interface de changement de la config OSC
         dialog = utils.ModifyOSCConfigDialog()
-        self.hide()
+        #self.hide()
         if dialog.exec() == QDialog.Accepted:
             print("Configuration OSC mise à jour.")
-            self.show()
+            #self.show()
         else:
             print("Modification de la configuration OSC annulée.")
-            self.show()
+            #self.show()
 class OperatorDialog(QDialog):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self.ui = Ui_OperatorDialog()
+        self.setWindowFlags(Qt.Window)
         self.ui.setupUi(self)
-        self.setWindowTitle("Interface opérateur - PCP 2026")
+        self.setWindowTitle("Interface opérateur - SHOW TIMER - PCP 2026")
+        self.setWindowIcon(QIcon("icon/icon.png"))
+        self.setModal(False)
+        
 
         self.duree_totale_ms = self.get_total_time()
         self.derniere_seconde_affichee = -1
         self.last_next_cues = [] 
+
+        self.load_screens()
 
         self.config_table()
         self.config_timer()
         self.fill_table()
         self.update_buttons_state("stopped")  # état initial
 
+
+        self.ui.cue_table_widget.setStyleSheet("""
+            QTableWidget::item:selected {
+                background-color: #00E32A;
+                color: white;
+            }
+        """)
+
+
+
+        self.prompteur_window = PrompterWindow(self.timer, self.duree_totale_ms) #fenetre du prompteur
+        self.ui.screen_active.toggled.connect(self.checkbox_screen_active) #activer / desactiver l'affichage du prompteur
+        self.ui.screen_selection.currentIndexChanged.connect(self.screen_selection_changed) #changer l'ecran d'affichage du prompteur 
+        self.ui.fullscreen.toggled.connect(self.fullscreen_state_changed) #activer / desactiver le plein ecran du prompteur
+
+        self.prompteur_window.closed_window.connect(
+            lambda: self.ui.screen_active.setChecked(False)
+        )
+
+        self.prompteur_window.fullscreen_changed.connect(
+            lambda checked: self.ui.fullscreen.setChecked(checked)
+        )
+
+        self.ui.prompt_textedit.textChanged.connect(
+            lambda: self.prompteur_window.set_prompt_text(self.ui.prompt_textedit.toPlainText())
+        )
+
+        #choix de la couleur de fond = mode chroma avec vert et mode luma avec noir
+        self.ui.key_mode.addItem("Chroma key (fond vert)", userData="#00FF00")
+        self.ui.key_mode.addItem("Luma key (fond noir)",   userData="#000000")
+
+        self.ui.key_mode.currentIndexChanged.connect(self.key_mode_changed)
+
+        #######bouton d'envoie de texte au prompteur########
+        self.ui.prompt_highlight.clicked.connect(self.prompteur_window.start_blink)
+        self.ui.prompt_clear.clicked.connect(lambda: self.ui.prompt_textedit.clear())
+
+        #########Raccourcis clavier##########
+        QShortcut(QKeySequence("F1"), self).activated.connect(self.ui.prompt_textedit.clear)  # Efface le texte du prompteur
+        QShortcut(QKeySequence("F2"), self).activated.connect(self.prompteur_window.start_blink)  # Fait clignoter le prompteur
+
+
+        ########BOURON GESTION DES CUES#############"
+        self.ui.add_cue.clicked.connect(lambda: self.add_cue_function())
+        self.ui.modify_cue.clicked.connect(lambda: self.modify_cue_function())
+        self.ui.delete_cue.clicked.connect(lambda: self.delete_cue_function())
+
+    ###################PARAMETRE DU PROMPTEUR########################################3
+    def checkbox_screen_active(self, checked):
+        if checked:
+            self.prompteur_window.show()
+        else:
+            self.prompteur_window.hide()
+
+    def screen_selection_changed(self, index):
+        self.prompteur_window.set_screen(self.ui.screen_selection.currentData())
+
+    def fullscreen_state_changed(self, checked):
+        self.prompteur_window.set_fullscreen(checked)
+
+    def key_mode_changed(self, index):
+        color = self.ui.key_mode.currentData()
+        self.prompteur_window.set_background_color(color)
+
+
+
+
+
+    #####################################################################################
+    def add_cue_function(self):
+        if utils.AddModifyCueDialog("ajouter").exec():
+            cues = database.db.GetAllCuesFromShow(database.db.GetActiveShow()) or []
+            self.timer.set_cues(cues)
+            self.fill_table()  # rafraîchit le tableau après l'ajout d'un cue
+
+    def modify_cue_function(self):
+        if self.selected_cue_id is None:
+            QMessageBox.warning(self, "Aucun cue sélectionné", "Veuillez sélectionner un cue à modifier.")
+            return
+
+        dialog = utils.AddModifyCueDialog("modifier", cue_id=self.selected_cue_id)
+        if dialog.exec():
+            cues = database.db.GetAllCuesFromShow(database.db.GetActiveShow()) or []
+            self.timer.set_cues(cues)
+            self.fill_table()  # rafraîchit le tableau après la modification d'un cue
+
+    def delete_cue_function(self):
+        if self.selected_cue_id is None:
+            QMessageBox.warning(self, "Aucun cue sélectionné", "Veuillez sélectionner un cue à supprimer.")
+            return
+
+        reply = QMessageBox.question(
+            self,
+            "Confirmer la suppression",
+            f"Voulez-vous vraiment supprimer le cue avec l'id {self.selected_cue_id} ?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+
+        if reply == QMessageBox.Yes:
+            print("Suppression confirmée.")
+            database.db.DeleteCue(self.selected_cue_id)
+            cues = database.db.GetAllCuesFromShow(database.db.GetActiveShow()) or []
+            self.timer.set_cues(cues)
+            self.fill_table()  # rafraîchit le tableau après la suppression d'un cue
+        else:
+            print("Suppression annulée.")
+
+    
     def update_buttons_state(self, etat):
         """
         Gère l'état des boutons selon la situation du timer.
@@ -208,6 +331,9 @@ class OperatorDialog(QDialog):
         self.ui.cue_table_widget.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
         self.ui.cue_table_widget.setEditTriggers(QTableWidget.NoEditTriggers)
         self.ui.cue_table_widget.setSelectionBehavior(QTableWidget.SelectRows)
+
+        self.selected_cue_id = None
+        self.ui.cue_table_widget.itemSelectionChanged.connect(self.on_cue_selected)
 
     def config_timer(self):
         from timer import PrompteurTimer
@@ -263,9 +389,25 @@ class OperatorDialog(QDialog):
                 for colonne in range(4):
                     self.ui.cue_table_widget.item(ligne, colonne).setBackground(couleur)
 
-    # ------------------------------------------------------------------
-    # Boutons
-    # ------------------------------------------------------------------
+            #les bouton sont par defaut desactivé
+            self.ui.modify_cue.setEnabled(False)
+            self.ui.delete_cue.setEnabled(False)
+
+    def on_cue_selected(self):
+        ligne = self.ui.cue_table_widget.currentRow()
+        if ligne < 0:
+            self.selected_cue_id = None
+            return
+        item_nom = self.ui.cue_table_widget.item(ligne, 0)
+        if item_nom:
+            self.selected_cue_id = item_nom.data(Qt.UserRole + 1)
+            print(f"Cue sélectionné - ID : {self.selected_cue_id}")
+
+            #quand un cue est sélectionné, on active les boutons de modification et de suppression de cue
+            self.ui.modify_cue.setEnabled(True)
+            self.ui.delete_cue.setEnabled(True)
+
+    ###################################BOUTON###############################################3
 
     def on_play_clicked(self):
         if self.timer.running:
@@ -323,9 +465,8 @@ class OperatorDialog(QDialog):
             self.timer.set_cues(cues)  # ← recharge les cues après le stop
 
         self.fill_table()
-    # ------------------------------------------------------------------
-    # Slots timer
-    # ------------------------------------------------------------------
+
+    #######################TIMER############################################3
 
     def on_timer_updated(self, temps_ms):
         from PySide6.QtGui import QColor
@@ -441,12 +582,48 @@ class OperatorDialog(QDialog):
         show = database.db.GetShowById(show_id)
         return show["duree"] if show else 0
     
+    def load_screens(self): #charge les ecran disponibles
+
+        ecrans = QApplication.screens()
+        
+        self.ui.screen_selection.clear()
+        
+        for i, ecran in enumerate(ecrans):
+            nom = ecran.name()
+            resolution = ecran.geometry()
+            self.ui.screen_selection.addItem(
+                f"Écran {i} - {nom} ({resolution.width()}x{resolution.height()})",
+                userData=i  # on stocke le numéro de l'écran dans le userData
+            )
+
+    def closeEvent(self, event):
+        reponse = QMessageBox.question(
+            self,
+            "Fermer ?",
+            "Voulez-vous fermer l'interface opérateur ?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+
+        if reponse == QMessageBox.Yes:
+            if self.timer.running:
+                self.timer.stop()
+            self.prompteur_window.hide()
+            from PySide6.QtWidgets import QApplication
+            for widget in QApplication.topLevelWidgets():
+                if isinstance(widget, MainWindow):
+                    widget.show()
+                    break
+            event.accept()
+        else:
+            event.ignore()
+    
 
 if __name__ == "__main__":
     database.connect_db() #Connexion a la base de donnée sqlite
     osc.connect_osc_client() #Connexion au client OSC, pour pouvoir envoyer des messages OSC a chataigne
 
-    database.db.AddCueToShow(1, "Test Cue 2", "Description du cue 2", 130000, "/test/cue2", "arg1 arg2", "#189E35") #ajout de cue de test dans la base de donnée, pour pouvoir tester l'interface de controle et le timer
+    #database.db.AddCueToShow(1, "Test Cue 2", "Description du cue 2", 130000, "/test/cue2", "arg1 arg2", "#189E35") #ajout de cue de test dans la base de donnée, pour pouvoir tester l'interface de controle et le timer
 
 
 
@@ -455,6 +632,7 @@ if __name__ == "__main__":
 
 
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon("icon/icon.png"))
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())

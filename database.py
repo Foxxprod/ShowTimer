@@ -91,6 +91,8 @@ class Database:
                 cursor = self.connection.cursor()
                 cursor.execute("DELETE FROM shows WHERE id = ?", (show_id,))
                 self.connection.commit()
+                cursor.execute("DELETE FROM cues WHERE show_id = ?", (show_id,)) #supprime aussi les cues correspondant a l'emmsion
+                self.connection.commit()
                 print(f"Emmission {show_id} supprimee de la base de donnée.")
             except sqlite3.Error as e:
                 print(f"Erreur lors de la suppression d'une emmission dans la base de donnée: {e}")
@@ -164,6 +166,31 @@ class Database:
                 print(f"Erreur lors de la recuperation des cues de l'emmsion active dans la base de donnée: {e}")
                 return None
 
+    def GetCueById(self, cue_id):
+        with self._lock:
+            try:
+                cursor = self.connection.cursor() #dictionnary pour renvoyer une dictionnaire.
+                cursor.row_factory = sqlite3.Row
+                cursor.execute("SELECT * FROM cues WHERE cue_id = ?", (cue_id,)) #recup le cue correspondant a l'id
+                result = cursor.fetchone()
+                if result:
+                    return dict(result) #renvoie le cue sous forme de dictionnaire
+                else:
+                    print(f"Aucun cue trouve dans la base de donnée avec l'id {cue_id}.")
+                    return None #si pas de cue trouvé on retourne None
+            except sqlite3.Error as e:
+                print(f"Erreur lors de la recuperation du cue dans la base de donnée: {e}")
+                return None
+            
+    def ModifyCue(self, cue_id, title, desc, time, osc_command, osc_args, color):
+        with self._lock:
+            try:
+                cursor = self.connection.cursor()
+                cursor.execute("UPDATE cues SET nom = ?, description = ?, temps = ?, osc_url = ?, osc_args = ?, color = ? WHERE cue_id = ?", (title, desc, time, osc_command, osc_args, color, cue_id))
+                self.connection.commit()
+                print(f"Cue {cue_id} modifie dans la base de donnée.")
+            except sqlite3.Error as e:
+                print(f"Erreur lors de la modification d'un cue dans la base de donnée: {e}")
     
     #####################################CONFIGURATION OSC##############################################""
     def SetOSCConfig(self, osc_ip, osc_port):
