@@ -1,6 +1,6 @@
 import time
 from PySide6.QtCore import QObject, QTimer, Signal
-import osc
+import osc, database
 
 
 class PrompteurTimer(QObject):
@@ -88,8 +88,12 @@ class PrompteurTimer(QObject):
         for cue in self.cues_list:
             if self.last_verified_time < cue["temps"] <= time_now:
                 self.fired_cue.emit(cue)
-                osc.osc_client.send(cue["osc_url"], cue["osc_args"])
-                print(f"Cue déclenché: {cue['nom']} à {cue['temps']} ms")
+                osc_state = database.db.GetOSCState()
+                if osc_state == "True":
+                    osc.osc_client.send(cue["osc_url"], cue["osc_args"])
+                    print(f"Cue déclenché: {cue['nom']} à {cue['temps']} ms")
+                else:
+                    print(f"OSC est desactive, cue non envoyé: {cue['nom']} à {cue['temps']} ms")
 
         #temps actu
         self.last_verified_time = time_now
