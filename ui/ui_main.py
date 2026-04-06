@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'maingypZGY.ui'
+## Form generated from reading UI file 'mainkhcPRe.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.9.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -16,9 +16,9 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView, QMainWindow,
-    QMenu, QMenuBar, QSizePolicy, QSpacerItem,
-    QTableView, QToolButton, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QHBoxLayout, QHeaderView,
+    QMainWindow, QMenu, QMenuBar, QSizePolicy,
+    QSpacerItem, QTableView, QToolButton, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -27,8 +27,8 @@ class Ui_MainWindow(object):
         MainWindow.resize(848, 544)
         self.actionConfig_OSC = QAction(MainWindow)
         self.actionConfig_OSC.setObjectName(u"actionConfig_OSC")
-        self.actionConfig_globales = QAction(MainWindow)
-        self.actionConfig_globales.setObjectName(u"actionConfig_globales")
+        self.actionConfig_prompter = QAction(MainWindow)
+        self.actionConfig_prompter.setObjectName(u"actionConfig_prompter")
         self.actionContact_33_6_52_75_25_29 = QAction(MainWindow)
         self.actionContact_33_6_52_75_25_29.setObjectName(u"actionContact_33_6_52_75_25_29")
         self.actiontitouan_gallin_gmail_com = QAction(MainWindow)
@@ -37,7 +37,15 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName(u"centralwidget")
         self.show_table_view = QTableView(self.centralwidget)
         self.show_table_view.setObjectName(u"show_table_view")
+        self.show_table_view.setEnabled(True)
         self.show_table_view.setGeometry(QRect(10, 10, 821, 421))
+        self.show_table_view.setStyleSheet(u"QTableWidget::item:selected {\n"
+"    background-color: #2ECC71;\n"
+"    color: white;\n"
+"}\n"
+"")
+        self.show_table_view.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.show_table_view.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.horizontalLayoutWidget = QWidget(self.centralwidget)
         self.horizontalLayoutWidget.setObjectName(u"horizontalLayoutWidget")
         self.horizontalLayoutWidget.setGeometry(QRect(10, 430, 821, 81))
@@ -116,7 +124,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuConfig.menuAction())
         self.menubar.addAction(self.menuAide.menuAction())
         self.menuConfig.addAction(self.actionConfig_OSC)
-        self.menuConfig.addAction(self.actionConfig_globales)
+        self.menuConfig.addAction(self.actionConfig_prompter)
         self.menuAide.addAction(self.actionContact_33_6_52_75_25_29)
         self.menuAide.addAction(self.actiontitouan_gallin_gmail_com)
 
@@ -128,7 +136,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.actionConfig_OSC.setText(QCoreApplication.translate("MainWindow", u"Config OSC", None))
-        self.actionConfig_globales.setText(QCoreApplication.translate("MainWindow", u"Config globales", None))
+        self.actionConfig_prompter.setText(QCoreApplication.translate("MainWindow", u"Config du prompteur", None))
         self.actionContact_33_6_52_75_25_29.setText(QCoreApplication.translate("MainWindow", u"Contact : +33 6 52 75 25 29", None))
         self.actiontitouan_gallin_gmail_com.setText(QCoreApplication.translate("MainWindow", u"titouan.gallin@gmail.com", None))
         self.open_show.setText(QCoreApplication.translate("MainWindow", u"OUVRIR", None))

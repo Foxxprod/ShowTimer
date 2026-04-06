@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'operatorliyGzY.ui'
+## Form generated from reading UI file 'operatorqvYfGZ.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.9.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -28,7 +28,7 @@ class Ui_Dialog(object):
         Dialog.resize(1300, 746)
         self.verticalLayoutWidget = QWidget(Dialog)
         self.verticalLayoutWidget.setObjectName(u"verticalLayoutWidget")
-        self.verticalLayoutWidget.setGeometry(QRect(10, 20, 698, 154))
+        self.verticalLayoutWidget.setGeometry(QRect(10, 20, 698, 151))
         self.verticalLayout = QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -73,17 +73,6 @@ class Ui_Dialog(object):
 
         self.progressBar = QProgressBar(self.verticalLayoutWidget)
         self.progressBar.setObjectName(u"progressBar")
-        self.progressBar.setStyleSheet(u"QProgressBar {\n"
-"    height: 30px;\n"
-"    border-radius: 5px;\n"
-"    background-color: #2b2b2b;\n"
-"    border: 1px solid #555555;\n"
-"}\n"
-"\n"
-"QProgressBar::chunk {\n"
-"    background-color: #4CAF50;\n"
-"    border-radius: 5px;\n"
-"}")
         self.progressBar.setMaximum(100)
         self.progressBar.setValue(0)
         self.progressBar.setOrientation(Qt.Orientation.Horizontal)
@@ -178,9 +167,9 @@ class Ui_Dialog(object):
         self.modify_cue.setIcon(icon7)
         self.modify_cue.setIconSize(QSize(32, 32))
         self.modify_cue.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
-        self.checkBox = QCheckBox(Dialog)
-        self.checkBox.setObjectName(u"checkBox")
-        self.checkBox.setGeometry(QRect(10, 680, 221, 20))
+        self.osc_active = QCheckBox(Dialog)
+        self.osc_active.setObjectName(u"osc_active")
+        self.osc_active.setGeometry(QRect(10, 680, 221, 20))
         self.line = QFrame(Dialog)
         self.line.setObjectName(u"line")
         self.line.setGeometry(QRect(850, 20, 20, 711))
@@ -243,7 +232,7 @@ class Ui_Dialog(object):
         self.add_cue.setText(QCoreApplication.translate("Dialog", u"Ajouter un CUE", None))
         self.delete_cue.setText(QCoreApplication.translate("Dialog", u"Supprimer le CUE", None))
         self.modify_cue.setText(QCoreApplication.translate("Dialog", u"Modifier le CUE", None))
-        self.checkBox.setText(QCoreApplication.translate("Dialog", u"Activer l'envoi des commandes OSC", None))
+        self.osc_active.setText(QCoreApplication.translate("Dialog", u"Activer l'envoi des commandes OSC", None))
         self.groupBox_2.setTitle(QCoreApplication.translate("Dialog", u"SORTIE VIDEO", None))
         self.choixDeLEcranDeSortieLabel.setText(QCoreApplication.translate("Dialog", u"Choix de l'ecran de sortie", None))
         self.modeDIncrustationLabel.setText(QCoreApplication.translate("Dialog", u"Mode d'incrustation ", None))

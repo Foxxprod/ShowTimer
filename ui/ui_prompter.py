@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'prompterQoAyBd.ui'
+## Form generated from reading UI file 'prompterwIhKYF.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.9.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -15,8 +15,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QDialog, QLabel, QSizePolicy,
-    QSpacerItem, QTextEdit, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QDialog, QSizePolicy, QSpacerItem,
+    QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -57,40 +57,32 @@ class Ui_Dialog(object):
 
         self.verticalLayout.addItem(self.verticalSpacer)
 
-        self.second_cue = QLabel(Dialog)
+        self.second_cue = QWidget(Dialog)
         self.second_cue.setObjectName(u"second_cue")
-        font1 = QFont()
-        font1.setFamilies([u"Arial"])
-        font1.setPointSize(30)
-        font1.setBold(True)
-        font1.setItalic(False)
-        self.second_cue.setFont(font1)
-        self.second_cue.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.second_cue.sizePolicy().hasHeightForWidth())
+        self.second_cue.setSizePolicy(sizePolicy1)
+        self.second_cue.setMinimumSize(QSize(0, 65))
 
         self.verticalLayout.addWidget(self.second_cue)
 
-        self.next_cue = QLabel(Dialog)
+        self.next_cue = QWidget(Dialog)
         self.next_cue.setObjectName(u"next_cue")
-        font2 = QFont()
-        font2.setFamilies([u"Arial"])
-        font2.setPointSize(60)
-        font2.setBold(True)
-        self.next_cue.setFont(font2)
-        self.next_cue.setStyleSheet(u"")
-        self.next_cue.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        sizePolicy1.setHeightForWidth(self.next_cue.sizePolicy().hasHeightForWidth())
+        self.next_cue.setSizePolicy(sizePolicy1)
+        self.next_cue.setMinimumSize(QSize(0, 120))
 
         self.verticalLayout.addWidget(self.next_cue)
 
-        self.show_remain_time = QLabel(Dialog)
-        self.show_remain_time.setObjectName(u"show_remain_time")
-        font3 = QFont()
-        font3.setFamilies([u"Arial"])
-        font3.setPointSize(30)
-        font3.setBold(True)
-        self.show_remain_time.setFont(font3)
-        self.show_remain_time.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.clock_label = QWidget(Dialog)
+        self.clock_label.setObjectName(u"clock_label")
+        sizePolicy1.setHeightForWidth(self.clock_label.sizePolicy().hasHeightForWidth())
+        self.clock_label.setSizePolicy(sizePolicy1)
+        self.clock_label.setMinimumSize(QSize(0, 65))
 
-        self.verticalLayout.addWidget(self.show_remain_time)
+        self.verticalLayout.addWidget(self.clock_label)
 
 
         self.verticalLayout_2.addLayout(self.verticalLayout)
@@ -103,8 +95,5 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
-        self.second_cue.setText(QCoreApplication.translate("Dialog", u"SECOND CUE", None))
-        self.next_cue.setText(QCoreApplication.translate("Dialog", u"NEXT CUE", None))
-        self.show_remain_time.setText(QCoreApplication.translate("Dialog", u"REMAIN TIME", None))
     # retranslateUi
 

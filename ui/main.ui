@@ -15,6 +15,9 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTableView" name="show_table_view">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -22,6 +25,12 @@
       <width>821</width>
       <height>421</height>
      </rect>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+    </property>
+    <property name="selectionBehavior">
+     <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
     </property>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget">
@@ -181,7 +190,7 @@
      <string>Config</string>
     </property>
     <addaction name="actionConfig_OSC"/>
-    <addaction name="actionConfig_globales"/>
+    <addaction name="actionConfig_prompter"/>
    </widget>
    <widget class="QMenu" name="menuAide">
     <property name="title">
@@ -198,9 +207,9 @@
     <string>Config OSC</string>
    </property>
   </action>
-  <action name="actionConfig_globales">
+  <action name="actionConfig_prompter">
    <property name="text">
-    <string>Config globales</string>
+    <string>Config du prompteur</string>
    </property>
   </action>
   <action name="actionContact_33_6_52_75_25_29">
