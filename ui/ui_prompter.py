@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'prompterZyKEul.ui'
+## Form generated from reading UI file 'prompterQoAyBd.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.9.1
 ##
@@ -61,7 +61,7 @@ class Ui_Dialog(object):
         self.second_cue.setObjectName(u"second_cue")
         font1 = QFont()
         font1.setFamilies([u"Arial"])
-        font1.setPointSize(50)
+        font1.setPointSize(30)
         font1.setBold(True)
         font1.setItalic(False)
         self.second_cue.setFont(font1)
@@ -73,9 +73,10 @@ class Ui_Dialog(object):
         self.next_cue.setObjectName(u"next_cue")
         font2 = QFont()
         font2.setFamilies([u"Arial"])
-        font2.setPointSize(80)
+        font2.setPointSize(60)
         font2.setBold(True)
         self.next_cue.setFont(font2)
+        self.next_cue.setStyleSheet(u"")
         self.next_cue.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout.addWidget(self.next_cue)
@@ -102,8 +103,8 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
-        self.second_cue.setText("")
-        self.next_cue.setText("")
-        self.show_remain_time.setText("")
+        self.second_cue.setText(QCoreApplication.translate("Dialog", u"SECOND CUE", None))
+        self.next_cue.setText(QCoreApplication.translate("Dialog", u"NEXT CUE", None))
+        self.show_remain_time.setText(QCoreApplication.translate("Dialog", u"REMAIN TIME", None))
     # retranslateUi
 

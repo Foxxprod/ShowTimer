@@ -7,16 +7,20 @@
 #--------------------------------------------------------------------------------------------------------------------
 
 #Fonction a implementer :
-# - Interface permetant de creer une emmision
-# - Interface de controle de l'emmision : choix de la durée, placement sur le timer de différents événements, lancement des timers...
-# - Pour chaques evenements TC, pouvoir envoyer un message OSC a chataigne
+# - Interface permetant de creer une emmision OKK
+# - Interface de controle de l'emmision : choix de la durée, placement sur le timer de différents événements, lancement des timers... OKK
+# - Pour chaques evenements TC, pouvoir envoyer un message OSC a chataigne 
 # - Preview de l'affichage du prompteur dans la fenetre principale 
-# - Saisie d'un message pour l'envoyer au prompteur, affichage en direct (en meme temps que l'on ecrit sur le clavier)
-# - Fenetre d'affichage du prompteur en double écran (avec fond pour chromakey ou lumakey)
-# - Pour chaques timer, on affiche au dessus un label avec un message du genre "Retour plateau dans..."
-# - Possibilitée d'affciher en meme temps plusieurs timers
-# - Pouvoir faire clignoter le texte du prompteur quand un nouveau message a été saisie
-# - Rendre plus visible le timers quand le temps arrive au bout (changement de couleur, clignotement...)
+# - Saisie d'un message pour l'envoyer au prompteur, affichage en direct (en meme temps que l'on ecrit sur le clavier) OKK
+# - Fenetre d'affichage du prompteur en double écran (avec fond pour chromakey ou lumakey) OKK
+# - Pour chaques timer, on affiche au dessus un label avec un message du genre "Retour plateau dans..." OKK
+# - Possibilitée d'affciher en meme temps plusieurs timers OKK
+# - Pouvoir faire clignoter le texte du prompteur quand un nouveau message a été saisie OKK
+# - Rendre plus visible le timers quand le temps arrive au bout (changement de couleur, clignotement...)*
+# - Avoir contour sur les texte du prompteur
+# - Pouvoir importer depuis excel un conducteur 
+# - pas pouvoir modifier tableau
+
 
 
 #--------------------------------------------------------------------------------------------------------------------

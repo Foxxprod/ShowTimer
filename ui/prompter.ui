@@ -81,13 +81,13 @@
        <property name="font">
         <font>
          <family>Arial</family>
-         <pointsize>50</pointsize>
+         <pointsize>30</pointsize>
          <italic>false</italic>
          <bold>true</bold>
         </font>
        </property>
        <property name="text">
-        <string/>
+        <string>SECOND CUE</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -99,12 +99,15 @@
        <property name="font">
         <font>
          <family>Arial</family>
-         <pointsize>80</pointsize>
+         <pointsize>60</pointsize>
          <bold>true</bold>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <property name="text">
-        <string/>
+        <string>NEXT CUE</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -121,7 +124,7 @@
         </font>
        </property>
        <property name="text">
-        <string/>
+        <string>REMAIN TIME</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignCenter</set>

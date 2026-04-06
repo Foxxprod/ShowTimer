@@ -104,20 +104,29 @@ class PrompterWindow(QWidget):
         self.timer.two_next_cues.connect(self.on_two_next_cues)
 
     def _reset_affichage(self):
-        self.ui.next_cue.setText("--")
-        self.ui.second_cue.setText("--")
-        self.ui.show_remain_time.setText("--")
+        self.ui.next_cue.setText("")
+        self.ui.second_cue.setText("")
+        self.ui.show_remain_time.setText("")
 
     def set_prompt_text(self, texte): #changement du texte du prompteur
         self.ui.prompt_text.setPlainText(texte)
 
     @Slot(int)
     def on_updated_time(self, temps_ms):
+        # Temps écoulé
+        h_e = temps_ms // 3600000
+        m_e = (temps_ms % 3600000) // 60000
+        s_e = (temps_ms % 60000) // 1000
+
+        # Temps restant
         restant = max(0, self.duree_totale_ms - temps_ms)
-        h = restant // 3600000
-        m = (restant % 3600000) // 60000
-        s = (restant % 60000) // 1000
-        self.ui.show_remain_time.setText(f"TEMPS D'ÉMISSION RESTANT : {h:02d}:{m:02d}:{s:02d}")
+        h_r = restant // 3600000
+        m_r = (restant % 3600000) // 60000
+        s_r = (restant % 60000) // 1000
+
+        self.ui.show_remain_time.setText(
+            f"Écoulé : {h_e:02d}:{m_e:02d}:{s_e:02d}     Restant : {h_r:02d}:{m_r:02d}:{s_r:02d}"
+        )
 
     @Slot(list)
     def on_two_next_cues(self, cues):
@@ -130,7 +139,7 @@ class PrompterWindow(QWidget):
             self.ui.next_cue.setText(f"{cue1['nom']} : {h:02d}:{m:02d}:{s:02d}")
         else:
             self.ui.next_cue.setText("")
-
+        """
         if len(cues) >= 2:
             cue2 = cues[1]
             temps_dans = max(0, cue2["temps"] - self.timer.actual_time())
@@ -140,6 +149,8 @@ class PrompterWindow(QWidget):
             self.ui.second_cue.setText(f"{cue2['nom']} : {h:02d}:{m:02d}:{s:02d}")
         else:
             self.ui.second_cue.setText("")
+
+        """
 
     ######################GESTION DU CLIGNOTEMENT###########################
     def start_blink(self):
