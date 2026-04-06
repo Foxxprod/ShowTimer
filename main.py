@@ -9,17 +9,17 @@
 #Fonction a implementer :
 # - Interface permetant de creer une emmision OKK
 # - Interface de controle de l'emmision : choix de la durée, placement sur le timer de différents événements, lancement des timers... OKK
-# - Pour chaques evenements TC, pouvoir envoyer un message OSC a chataigne 
+# - Pour chaques evenements TC, pouvoir envoyer un message OSC a chataigne OKK
 # - Preview de l'affichage du prompteur dans la fenetre principale 
 # - Saisie d'un message pour l'envoyer au prompteur, affichage en direct (en meme temps que l'on ecrit sur le clavier) OKK
 # - Fenetre d'affichage du prompteur en double écran (avec fond pour chromakey ou lumakey) OKK
 # - Pour chaques timer, on affiche au dessus un label avec un message du genre "Retour plateau dans..." OKK
-# - Possibilitée d'affciher en meme temps plusieurs timers OKK
+# - Possibilitée d'affciher en meme temps plusieurs timers OKK -- RETIREE ENFAIT DANS LA DERNIERE VERSION
 # - Pouvoir faire clignoter le texte du prompteur quand un nouveau message a été saisie OKK
-# - Rendre plus visible le timers quand le temps arrive au bout (changement de couleur, clignotement...)*
-# - Avoir contour sur les texte du prompteur
+# - Rendre plus visible le timers quand le temps arrive au bout (changement de couleur, clignotement...)
+# - Avoir contour sur les texte du prompteur -- VOIR COMMENT FAIRE CAR PAS POSSIBLE SUR QT
 # - Pouvoir importer depuis excel un conducteur 
-# - pas pouvoir modifier tableau
+# - pas pouvoir modifier tableau d'ajout des shows
 
 
 
@@ -29,6 +29,7 @@ import sys, threading
 from ui.ui_main import Ui_MainWindow
 from ui.ui_operator import Ui_Dialog as Ui_OperatorDialog
 from prompter import PrompterWindow
+from prompter_settings_dialog import PrompterSettingsDialog
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit, QTextEdit, QHBoxLayout, QGridLayout, QMessageBox, QDialog
 from PySide6.QtGui import QStandardItemModel, QStandardItem
@@ -56,6 +57,7 @@ class MainWindow(QMainWindow):
 
         ######BARRE DE MENUS######
         self.ui.actionConfig_OSC.triggered.connect(self.change_osc_config) #quand on clique sur le menu de configuration OSC, on affiche la fenetre de configuration OSC
+        self.ui.actionConfig_prompter.triggered.connect(self.change_prompter_config) #quand on clique sur le menu de configuration du prompteur, on affiche la fenetre de configuration du prompteur
 
         ######BOUTON#######
         self.ui.delete_show.clicked.connect(self.delete_show) #quand on clique sur le bouton de suppression d'une emmsion, on appelle la fonction de suppression d'une emmsion dans la db, en lui passant l'id de l'emmsion selectionné.
@@ -174,6 +176,11 @@ class MainWindow(QMainWindow):
         else:
             print("Modification de la configuration OSC annulée.")
             #self.show()
+
+    def change_prompter_config(self): #interface de changement des couleurs, timer, etc du prompteur
+        dialog = PrompterSettingsDialog(parent=self)
+        dialog.exec()
+
 class OperatorDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -195,6 +202,10 @@ class OperatorDialog(QDialog):
         self.config_timer()
         self.fill_table()
         self.update_buttons_state("stopped")  # état initial
+
+        self.ui.osc_active.toggled.connect(self.change_osc_activ_state)
+
+        self.load_osc_active_in_ui()
 
 
         self.ui.cue_table_widget.setStyleSheet("""
@@ -259,6 +270,24 @@ class OperatorDialog(QDialog):
     def key_mode_changed(self, index):
         color = self.ui.key_mode.currentData()
         self.prompteur_window.set_background_color(color)
+
+
+    ##################ACTIVATION OU NON DE L'ENVOIE OSC#################################
+    def change_osc_activ_state(self, state):
+        state = self.ui.osc_active.isChecked()
+        if state == True:
+            database.db.SetOSCState("True")
+        else:
+            database.db.SetOSCState("False")
+
+    def load_osc_active_in_ui(self):
+        state = database.db.GetOSCState()
+        if state == "True":
+            state = True
+            self.ui.osc_active.setChecked(state)
+        else:
+            state = False
+            self.ui.osc_active.setChecked(state)
 
 
 
@@ -327,12 +356,14 @@ class OperatorDialog(QDialog):
 
     def config_table(self):
         from PySide6.QtWidgets import QTableWidget, QHeaderView
-        self.ui.cue_table_widget.setColumnCount(4)
-        self.ui.cue_table_widget.setHorizontalHeaderLabels(["Nom", "Description", "Déclenchement", "Dans"])
+        self.ui.cue_table_widget.setColumnCount(6)
+        self.ui.cue_table_widget.setHorizontalHeaderLabels(["Nom", "Description", "Déclenchement", "URL OSC", "Args OSC", "Dans"])
         self.ui.cue_table_widget.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         self.ui.cue_table_widget.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self.ui.cue_table_widget.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
         self.ui.cue_table_widget.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        self.ui.cue_table_widget.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
+        self.ui.cue_table_widget.horizontalHeader().setSectionResizeMode(5, QHeaderView.ResizeToContents)
         self.ui.cue_table_widget.setEditTriggers(QTableWidget.NoEditTriggers)
         self.ui.cue_table_widget.setSelectionBehavior(QTableWidget.SelectRows)
 
@@ -383,14 +414,16 @@ class OperatorDialog(QDialog):
             self.ui.cue_table_widget.setItem(ligne, 0, QTableWidgetItem(cue["nom"]))
             self.ui.cue_table_widget.setItem(ligne, 1, QTableWidgetItem(cue.get("description", "")))
             self.ui.cue_table_widget.setItem(ligne, 2, QTableWidgetItem(f"{h:02d}:{m:02d}:{s:02d}"))
-            self.ui.cue_table_widget.setItem(ligne, 3, QTableWidgetItem("--:--:--"))
+            self.ui.cue_table_widget.setItem(ligne, 3, QTableWidgetItem(cue.get("osc_url", "") or ""))
+            self.ui.cue_table_widget.setItem(ligne, 4, QTableWidgetItem(str(cue.get("osc_args", "") or "")))
+            self.ui.cue_table_widget.setItem(ligne, 5, QTableWidgetItem("--:--:--"))
 
             self.ui.cue_table_widget.item(ligne, 0).setData(Qt.UserRole,     cue["temps"])
             self.ui.cue_table_widget.item(ligne, 0).setData(Qt.UserRole + 1, cue["cue_id"])
 
             if cue.get("color"):
                 couleur = QColor(cue["color"])
-                for colonne in range(4):
+                for colonne in range(self.ui.cue_table_widget.columnCount()):
                     self.ui.cue_table_widget.item(ligne, colonne).setBackground(couleur)
 
             #les bouton sont par defaut desactivé
@@ -512,12 +545,12 @@ class OperatorDialog(QDialog):
             temps_cue = item_nom.data(Qt.UserRole)
             dans_ms   = temps_cue - temps_ms
             if dans_ms <= 0:
-                self.ui.cue_table_widget.item(ligne, 3).setText("passé")
+                self.ui.cue_table_widget.item(ligne, 5).setText("passé")
             else:
                 h = dans_ms // 3600000
                 m = (dans_ms % 3600000) // 60000
                 s = (dans_ms % 60000) // 1000
-                self.ui.cue_table_widget.item(ligne, 3).setText(f"{h:02d}:{m:02d}:{s:02d}")
+                self.ui.cue_table_widget.item(ligne, 5).setText(f"{h:02d}:{m:02d}:{s:02d}")
 
 
         self.ui.cue_table_widget.setUpdatesEnabled(True)
