@@ -192,6 +192,57 @@ class Database:
             except sqlite3.Error as e:
                 print(f"Erreur lors de la modification d'un cue dans la base de donnée: {e}")
     
+    #####################################CONFIGURATION PROMPTEUR#########################################
+
+    def GetPrompterConfig(self):
+        defaults = {
+            "prompter_text_size":       "60",
+            "prompter_text_color":      "#B8860B",
+            "next_cue_text_size":       "42",
+            "next_cue_text_color":      "#FFFFFF",
+            "next_cue_outline_width":   "4",
+            "second_cue_text_size":     "28",
+            "second_cue_text_color":    "#AAAAAA",
+            "second_cue_outline_width": "4",
+            "clock_text_size":          "28",
+            "clock_text_color":         "#FFFFFF",
+            "clock_outline_width":      "4",
+            "blink_first_time":         "20000",
+            "blink_second_time":        "10000",
+            "blink_third_time":         "5000",
+            "blink_first_color":        "#00CC00",
+            "blink_second_color":       "#FF8800",
+            "blink_third_color":        "#FF0000",
+        }
+        with self._lock:
+            try:
+                placeholders = ",".join("?" * len(defaults))
+                cursor = self.connection.cursor()
+                cursor.execute(
+                    f"SELECT parameter, value FROM config WHERE parameter IN ({placeholders})",
+                    list(defaults.keys())
+                )
+                for parameter, value in cursor.fetchall():
+                    if value is not None:
+                        defaults[parameter] = value
+                return defaults
+            except sqlite3.Error as e:
+                print(f"Erreur lors de la recuperation de la config prompteur: {e}")
+                return defaults
+
+    def SetPrompterConfig(self, **kwargs):
+        with self._lock:
+            try:
+                cursor = self.connection.cursor()
+                for parameter, value in kwargs.items():
+                    cursor.execute(
+                        "INSERT OR REPLACE INTO config (parameter, value) VALUES (?, ?)",
+                        (parameter, value)
+                    )
+                self.connection.commit()
+            except sqlite3.Error as e:
+                print(f"Erreur lors de la mise a jour de la config prompteur: {e}")
+
     #####################################CONFIGURATION OSC##############################################""
     def SetOSCConfig(self, osc_ip, osc_port):
         with self._lock:
@@ -221,3 +272,29 @@ class Database:
             except sqlite3.Error as e:
                 print(f"Erreur lors de la recuperation de la configuration OSC dans la base de donnée: {e}")
                 return None, None
+            
+    def SetOSCState(self, state):
+        with self._lock:
+            try:
+                cursor = self.connection.cursor()
+                cursor.execute("INSERT OR REPLACE INTO config (parameter, value) VALUES ('osc_active', ?)", (state,))
+                print(f"L'etat  OSC a ete mis a jour dans la base de donnée. Etat: {state}")
+                self.connection.commit()
+            except sqlite3.Error as e:
+                print(f"Erreur lors de la mise a jour de la configuration OSC dans la base de donnée: {e}")
+
+
+    def GetOSCState(self):
+        with self._lock:
+            try:
+                cursor = self.connection.cursor()
+                cursor.execute("SELECT value FROM config WHERE parameter = 'osc_active'") #recup la valeur de l'etat OSC
+                result = cursor.fetchone()
+                if result:
+                    return result[0] #renvoie l'etat
+                else:
+                    print("Aucune configuration OSC trouvee dans la base de donnée.")
+                    return None #si pas de config gezocht on retourne None
+            except sqlite3.Error as e:
+                print(f"Erreur lors de la recuperation de la configuration OSC dans la base de donnée: {e}")
+                return None
