@@ -836,4 +836,152 @@ class ImportExcelDialog(QDialog):
         self.accept()
 
 
+# ─────────────────────────────────────────────────────────────
+# Export PDF du show actif
+# ─────────────────────────────────────────────────────────────
+
+def _ms_to_hms(ms):
+    ms = max(0, int(ms))
+    h  = ms // 3600000
+    m  = (ms % 3600000) // 60000
+    s  = (ms % 60000) // 1000
+    return f"{h:02d}:{m:02d}:{s:02d}"
+
+
+def export_show_to_pdf(show_id, output_path):
+    """Exporte le show (show_id) et tous ses cues en PDF vers output_path."""
+    import base64, os
+    from PySide6.QtGui import QTextDocument, QPageSize, QPageLayout
+    from PySide6.QtPrintSupport import QPrinter
+    from PySide6.QtCore import QSizeF
+
+    show = database.db.GetShowById(show_id)
+    if show is None:
+        raise ValueError(f"Show {show_id} introuvable.")
+
+    cues = database.db.GetAllCuesFromShow(show_id) or []
+    cues = sorted(cues, key=lambda c: c["temps"])
+
+    # ── Icône en base64 ──
+    icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icon", "icon.png")
+    icon_src = ""
+    if os.path.exists(icon_path):
+        with open(icon_path, "rb") as f:
+            icon_src = "data:image/png;base64," + base64.b64encode(f.read()).decode()
+
+    logo_html = f'<img src="{icon_src}" height="48" style="vertical-align:middle;">' if icon_src else ""
+    logo_small = logo_html.replace('height="48"', 'height="20"') if logo_html else ""
+
+    # ── Infos show ──
+    total_ms   = show.get("duree", 0)
+    total_str  = _ms_to_hms(total_ms)
+    show_title = show.get("nom", "")
+    show_desc  = show.get("description", "") or "—"
+
+    # ── Lignes du tableau de cues ──
+    rows_html = ""
+    prev_ms = 0
+    for i, cue in enumerate(cues):
+        t_ms   = cue.get("temps", 0)
+        delta  = t_ms - prev_ms if i > 0 else t_ms
+        prev_ms = t_ms
+
+        bg = "#ffffff" if i % 2 == 0 else "#f5f5f5"
+        rows_html += f"""
+        <tr style="background:{bg};">
+            <td style="text-align:center;">{i + 1}</td>
+            <td><b>{cue.get('nom','')}</b></td>
+            <td class="desc">{cue.get('description','') or '&mdash;'}</td>
+            <td style="text-align:center;">{_ms_to_hms(t_ms)}</td>
+            <td style="text-align:center;">+{_ms_to_hms(delta)}</td>
+            <td style="font-family:monospace;">{cue.get('osc_url','') or '&mdash;'}</td>
+            <td style="font-family:monospace;">{cue.get('osc_args','') or '&mdash;'}</td>
+        </tr>"""
+
+    html = f"""<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body      {{ font-family: Arial, sans-serif; font-size: 10pt; color: #1a1a1a; margin: 0; padding: 0; }}
+  .page-header {{
+      border-bottom: 3px solid #2c3e50; padding-bottom: 8px; margin-bottom: 18px;
+  }}
+  .page-header table {{ width: auto; border-collapse: collapse; }}
+  .page-header td {{ padding: 0 10px 0 0; vertical-align: middle; border: none; background: none; }}
+  .page-header h1 {{ margin: 0; font-size: 18pt; color: #2c3e50; }}
+  .show-block {{
+      background: #f0f4f8; border-left: 5px solid #2c3e50;
+      padding: 10px 14px; margin-bottom: 20px; border-radius: 3px;
+  }}
+  .show-block h2 {{ margin: 0 0 4px 0; font-size: 14pt; color: #2c3e50; }}
+  .show-block p  {{ margin: 2px 0; font-size: 9pt; color: #444; }}
+  table {{ width: 100%; border-collapse: collapse; font-size: 6.5pt; table-layout: auto; }}
+  thead tr {{ background: #2c3e50; color: white; }}
+  thead th {{ padding: 3px 4px; text-align: left; font-weight: bold; white-space: nowrap; }}
+  thead th.desc {{ white-space: normal; width: 100%; }}
+  tbody td {{ padding: 2px 4px; border-bottom: 1px solid #ddd; vertical-align: top; white-space: nowrap; }}
+  tbody td.desc {{ white-space: normal; }}
+  .footer {{
+      margin-top: 24px; border-top: 1px solid #ccc; padding-top: 6px;
+      font-size: 8pt; color: #888;
+  }}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <table><tr>
+    <td>{logo_html}</td>
+    <td><h1>Rapport &mdash; ShowTimer V1.0</h1></td>
+  </tr></table>
+</div>
+
+<br>
+
+<div class="show-block">
+  <h2>{show_title}</h2>
+  <p><b>Description :</b> {show_desc}</p>
+  <p><b>Dur&eacute;e totale :</b> {total_str}</p>
+  <p><b>Nombre de cues :</b> {len(cues)}</p>
+</div>
+
+<br>
+
+
+<table>
+  <thead>
+    <tr>
+      <th>N&deg;</th>
+      <th>Nom</th>
+      <th class="desc">Description</th>
+      <th>D&eacute;clenchement</th>
+      <th>&Delta; Pr&eacute;c&eacute;dent</th>
+      <th>Commande OSC</th>
+      <th>Argument OSC</th>
+    </tr>
+  </thead>
+  <tbody>
+    {rows_html}
+  </tbody>
+</table>
+
+<div class="footer">
+  {logo_small}
+  &copy; Foxx Prod 2026 &mdash; ShowTimer V1.0
+</div>
+
+</body>
+</html>"""
+
+    printer = QPrinter(QPrinter.HighResolution)
+    printer.setOutputFormat(QPrinter.OutputFormat.PdfFormat)
+    printer.setOutputFileName(output_path)
+    printer.setPageSize(QPageSize(QPageSize.PageSizeId.A4))
+    printer.setPageOrientation(QPageLayout.Orientation.Portrait)
+
+    doc = QTextDocument()
+    doc.setHtml(html)
+    doc.setPageSize(QSizeF(printer.pageRect(QPrinter.Unit.Point).size()))
+    doc.print_(printer)
 

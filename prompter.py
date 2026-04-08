@@ -94,6 +94,8 @@ class PrompterWindow(QWidget):
         self.blink_stop_timer.timeout.connect(self._stop_blink)
 
         self.blink_state = False
+        self._cfg_text_size = "60"
+        self._cfg_text_color = "#B8860B"
 
         ######GESTION DU CLIGNOTEMENT (next_cue_label)###############
         self.cue_blink_timer = QTimer(self)
@@ -120,12 +122,15 @@ class PrompterWindow(QWidget):
     def _apply_config(self):
         c = database.db.GetPrompterConfig()
 
+        self._cfg_text_size = c['prompter_text_size']
+        self._cfg_text_color = c['prompter_text_color']
+
         # Texte principal
         self.ui.prompt_text.setStyleSheet(f"""
             QTextEdit {{
-                font-size: {c['prompter_text_size']}px;
+                font-size: {self._cfg_text_size}px;
                 font-weight: bold;
-                color: {c['prompter_text_color']};
+                color: {self._cfg_text_color};
                 background-color: transparent;
                 border: none;
                 line-height: 80%;
@@ -336,38 +341,38 @@ class PrompterWindow(QWidget):
     def _on_blink_tick(self):
         self.blink_state = not self.blink_state
         if self.blink_state:
-            self.ui.prompt_text.setStyleSheet("""
-                QTextEdit {
-                    font-size: 60px;
+            self.ui.prompt_text.setStyleSheet(f"""
+                QTextEdit {{
+                    font-size: {self._cfg_text_size}px;
                     font-weight: bold;
                     color: #000000;
                     background-color: #FF0000;
                     border: none;
                     line-height: 80%;
-                }
+                }}
             """)
         else:
-            self.ui.prompt_text.setStyleSheet("""
-                QTextEdit {
-                    font-size: 60px;
+            self.ui.prompt_text.setStyleSheet(f"""
+                QTextEdit {{
+                    font-size: {self._cfg_text_size}px;
                     font-weight: bold;
-                    color: #B8860B;
+                    color: {self._cfg_text_color};
                     background-color: transparent;
                     border: none;
                     line-height: 80%;
-                }
+                }}
             """)
 
     def _stop_blink(self):
         self.blink_timer.stop()
         self.blink_state = False
-        self.ui.prompt_text.setStyleSheet("""
-            QTextEdit {
-                font-size: 60px;
+        self.ui.prompt_text.setStyleSheet(f"""
+            QTextEdit {{
+                font-size: {self._cfg_text_size}px;
                 font-weight: bold;
-                color: #B8860B;
+                color: {self._cfg_text_color};
                 background-color: transparent;
                 border: none;
                 line-height: 80%;
-            }
+            }}
         """)

@@ -30,7 +30,7 @@ from timeline import TimelineWidget
 from ui.ui_main import Ui_MainWindow
 from ui.ui_operator import Ui_Dialog as Ui_OperatorDialog
 from prompter import PrompterWindow
-from utils import PrompterSettingsDialog
+from utils import PrompterSettingsDialog, export_show_to_pdf
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit, QTextEdit, QHBoxLayout, QGridLayout, QMessageBox, QDialog
 from PySide6.QtGui import QStandardItemModel, QStandardItem
@@ -216,10 +216,16 @@ class OperatorDialog(QDialog):
         self.setWindowIcon(QIcon("icon/icon.png"))
         self.setModal(False)
         
+        index = self.ui.tabWidget.indexOf(self.ui.fichier)
+        if index >= 0:
+            self.ui.tabWidget.setCurrentIndex(index)
 
         self.duree_totale_ms = self.get_total_time()  #duree totale de l'emmision
         self.derniere_seconde_affichee = -1 #derniere seconde affichée
-        self.last_next_cues = [] 
+        self.last_next_cues = []
+        self._table_next_row    = -1
+        self._table_blink_state = False
+        self._table_blink_mode  = None  # None | "first" | "second" | "third"
 
         self.load_screens()
 
@@ -241,6 +247,7 @@ class OperatorDialog(QDialog):
         self.ui.csv_import.clicked.connect(lambda: self.import_from_file("csv"))
         self.ui.excel_export.clicked.connect(lambda: self.export_cues("excel"))
         self.ui.csv_export.clicked.connect(lambda: self.export_cues("csv"))
+        self.ui.pdf_export.clicked.connect(self._export_pdf)
 
 
         ############BARRE DE FONCTIONS - MENU OSC########
@@ -265,14 +272,6 @@ class OperatorDialog(QDialog):
 
         self.ui.prompter_config.clicked.connect(self.config_prompter)
 
-        self.prompteur_window.closed_window.connect(
-            lambda: self.ui.screen_active.setChecked(False)
-        )
-
-        self.prompteur_window.fullscreen_changed.connect(
-            lambda checked: self.ui.fullscreen.setChecked(checked)
-        )
-
         self.ui.prompt_textedit.setPlaceholderText("Saisissez ici un texte à afficher sur le prompteur...")
         self.ui.prompt_textedit.textChanged.connect(
             lambda: self.prompteur_window.set_prompt_text(self.ui.prompt_textedit.toPlainText())
@@ -285,15 +284,17 @@ class OperatorDialog(QDialog):
         self.ui.key_mode.currentIndexChanged.connect(self.key_mode_changed)
 
         #######bouton d'envoie de texte au prompteur########
-        self.ui.prompt_highlight.clicked.connect(self.prompteur_window.start_blink)
+        self.ui.prompt_highlight.clicked.connect(lambda: self.prompteur_window.start_blink())
         self.ui.prompt_clear.clicked.connect(lambda: self.ui.prompt_textedit.clear())
 
-        self.ui.prompt_highlight_2.clicked.connect(self.prompteur_window.start_blink)
+        self.ui.prompt_highlight_2.clicked.connect(lambda: self.prompteur_window.start_blink())
         self.ui.prompt_clear_2.clicked.connect(lambda: self.ui.prompt_textedit.clear())
 
         #########Raccourcis clavier##########
         QShortcut(QKeySequence("F1"), self).activated.connect(self.ui.prompt_textedit.clear)  # Efface le texte du prompteur
-        QShortcut(QKeySequence("F2"), self).activated.connect(self.prompteur_window.start_blink)  # Fait clignoter le prompteur
+        QShortcut(QKeySequence("F2"), self).activated.connect(lambda: self.prompteur_window.start_blink())  # Fait clignoter le prompteur
+
+        self._connect_prompter_window_signals()
 
 
         ########BOUTONS GESTION DES CUES#############
@@ -346,21 +347,31 @@ class OperatorDialog(QDialog):
 
         was_visible = self.prompteur_window.isVisible()
         was_fullscreen = self.ui.fullscreen.isChecked()
+        was_geometry = self.prompteur_window.geometry() if not was_fullscreen else None
         screen_index = self.ui.screen_selection.currentIndex()
         key_color = self.ui.key_mode.currentData()
         if PrompterSettingsDialog(self).exec_():
             if self.prompteur_window:
                 self.prompteur_window.close()
                 self.prompteur_window = PrompterWindow(self.timer, self.duree_totale_ms)
+                self._connect_prompter_window_signals()
                 if was_visible:
-                    self.prompteur_window.set_screen(self.ui.screen_selection.itemData(screen_index))
                     self.prompteur_window.set_background_color(key_color)
                     if was_fullscreen:
+                        self.prompteur_window.set_screen(self.ui.screen_selection.itemData(screen_index))
                         self.prompteur_window.set_fullscreen(True)
                     else:
+                        self.prompteur_window.setGeometry(was_geometry)
                         self.prompteur_window.show()
                     self.ui.screen_active.setChecked(True)
 
+    def _connect_prompter_window_signals(self):
+        self.prompteur_window.closed_window.connect(
+            lambda: self.ui.screen_active.setChecked(False)
+        )
+        self.prompteur_window.fullscreen_changed.connect(
+            lambda checked: self.ui.fullscreen.setChecked(checked)
+        )
 
     def checkbox_screen_active(self, checked):
         if checked:
@@ -603,6 +614,9 @@ class OperatorDialog(QDialog):
         self.timer.two_next_cues.connect(self.on_next_cue)
         self.timer.fired_cue.connect(self.on_cue_fired)
 
+        self._table_blink_timer = QTimer(self)
+        self._table_blink_timer.timeout.connect(self._on_table_blink_tick)
+
         self.ui.timer_play.clicked.connect(self.on_play_clicked)
         self.ui.timer_pause.clicked.connect(self.on_pause_clicked)
         self.ui.timer_stop.clicked.connect(self.on_stop_clicked)
@@ -640,10 +654,12 @@ class OperatorDialog(QDialog):
             self.ui.cue_table_widget.item(ligne, 0).setData(Qt.UserRole,     cue["temps"])
             self.ui.cue_table_widget.item(ligne, 0).setData(Qt.UserRole + 1, cue["cue_id"])
 
-            if cue.get("color"):
-                couleur = QColor(cue["color"])
-                for colonne in range(self.ui.cue_table_widget.columnCount()):
-                    self.ui.cue_table_widget.item(ligne, colonne).setBackground(couleur)
+            original_bg = QColor(cue["color"]) if cue.get("color") else QColor()
+            for colonne in range(self.ui.cue_table_widget.columnCount()):
+                item = self.ui.cue_table_widget.item(ligne, colonne)
+                item.setData(Qt.UserRole + 2, original_bg)
+                if cue.get("color"):
+                    item.setBackground(original_bg)
 
             #les bouton sont par defaut desactivé
             self.ui.modify_cue.setEnabled(False)
@@ -777,8 +793,32 @@ class OperatorDialog(QDialog):
                 s = (dans_ms % 60000) // 1000
                 self.ui.cue_table_widget.item(ligne, 5).setText(f"{h:02d}:{m:02d}:{s:02d}")
 
-
         self.ui.cue_table_widget.setUpdatesEnabled(True)
+
+        # Clignotement du prochain cue (seuils fixes)
+        if self._table_next_row >= 0 and self.last_next_cues:
+            temps_dans = self.last_next_cues[0]["temps"] - temps_ms
+            if temps_dans <= 0:
+                new_mode, interval = None, None
+            elif temps_dans <= 5_000:
+                new_mode, interval = "third", 250    # rouge,  rapide
+            elif temps_dans <= 10_000:
+                new_mode, interval = "second", 450   # orange, moyen
+            elif temps_dans <= 15_000:
+                new_mode, interval = "first", 800    # vert,   lent
+            else:
+                new_mode, interval = None, None
+
+            if new_mode != self._table_blink_mode:
+                self._table_blink_mode  = new_mode
+                self._table_blink_state = False
+                self._table_blink_timer.stop()
+                if new_mode is not None:
+                    self._table_blink_timer.setInterval(interval)
+                    self._table_blink_timer.start()
+                else:
+                    # Remettre le fond vert fixe
+                    self._set_row_background(self._table_next_row, QColor("#1a7a1a"))
 
     def on_cue_fired(self, cue):
         from PySide6.QtGui import QColor
@@ -807,35 +847,83 @@ class OperatorDialog(QDialog):
 
         self.last_next_cues = cues
 
-        self.ui.cue_table_widget.setUpdatesEnabled(False)
+        # Stopper le clignotement — sera redémarré si besoin dans on_timer_updated
+        self._table_blink_timer.stop()
+        self._table_blink_mode  = None
+        self._table_blink_state = False
+        self._table_next_row    = -1
 
         temps_actuel = self.timer.actual_time()
+        next_temps   = {c["temps"]: i for i, c in enumerate(cues)}  # temps → index dans cues
+
+        COLOR_PAST        = QColor("#555555")
+        COLOR_NEXT        = QColor("#1a7a1a")   # vert
+        COLOR_SECOND_NEXT = QColor("#0f4f0f")   # vert foncé
+        FG_PAST           = QColor("#999999")
+        FG_DEFAULT        = QColor("white")
+
+        self.ui.cue_table_widget.setUpdatesEnabled(False)
 
         for ligne in range(self.ui.cue_table_widget.rowCount()):
             item_nom = self.ui.cue_table_widget.item(ligne, 0)
             if item_nom is None:
                 continue
-
             temps_cue = item_nom.data(Qt.UserRole)
+
+            if temps_cue <= temps_actuel:
+                # Cue passé → fond gris
+                bg = COLOR_PAST
+                fg = FG_PAST
+            elif temps_cue in next_temps:
+                idx = next_temps[temps_cue]
+                if idx == 0:
+                    bg = COLOR_NEXT
+                    fg = FG_DEFAULT
+                    self._table_next_row = ligne
+                else:
+                    bg = COLOR_SECOND_NEXT
+                    fg = FG_DEFAULT
+            else:
+                # Cue futur neutre → couleur originale
+                orig = item_nom.data(Qt.UserRole + 2)
+                bg = orig if (orig and orig.isValid()) else QColor()
+                fg = FG_DEFAULT
 
             for colonne in range(self.ui.cue_table_widget.columnCount()):
                 item = self.ui.cue_table_widget.item(ligne, colonne)
                 if item:
-                    if temps_cue <= temps_actuel:
-                        item.setForeground(QColor("darkGray"))
+                    if bg.isValid():
+                        item.setBackground(bg)
                     else:
-                        item.setForeground(QColor("white"))
-
-        for cue in cues:
-            for ligne in range(self.ui.cue_table_widget.rowCount()):
-                item_nom = self.ui.cue_table_widget.item(ligne, 0)
-                if item_nom and item_nom.data(Qt.UserRole) == cue["temps"]:
-                    for colonne in range(self.ui.cue_table_widget.columnCount()):
-                        item = self.ui.cue_table_widget.item(ligne, colonne)
-                        if item:
-                            item.setForeground(QColor("orange"))
+                        item.setData(Qt.BackgroundRole, None)
+                    item.setForeground(fg)
 
         self.ui.cue_table_widget.setUpdatesEnabled(True)
+
+    def _set_row_background(self, ligne, color):
+        for colonne in range(self.ui.cue_table_widget.columnCount()):
+            item = self.ui.cue_table_widget.item(ligne, colonne)
+            if item:
+                if color is None or not color.isValid():
+                    item.setData(Qt.BackgroundRole, None)
+                else:
+                    item.setBackground(color)
+
+    def _on_table_blink_tick(self):
+        from PySide6.QtGui import QColor
+        if self._table_next_row < 0:
+            return
+        self._table_blink_state = not self._table_blink_state
+        if self._table_blink_state:
+            # Couleur vive selon le mode
+            colors = {
+                "first":  QColor("#00CC00"),   # vert   — ≤ 15s
+                "second": QColor("#FF8800"),   # orange — ≤ 10s
+                "third":  QColor("#FF0000"),   # rouge  — ≤ 5s
+            }
+            self._set_row_background(self._table_next_row, colors.get(self._table_blink_mode, QColor("#00DD00")))
+        else:
+            self._set_row_background(self._table_next_row, QColor("#1a7a1a"))
 
     def get_total_time(self):
         show_id = database.db.GetActiveShow()
@@ -953,8 +1041,28 @@ class OperatorDialog(QDialog):
                 writer.writerows(rows)
 
         QMessageBox.information(self, "Export réussi", f"{len(cues)} cue(s) exporté(s) vers :\n{path}")
-   
-   
+
+    def _export_pdf(self):
+        from PySide6.QtWidgets import QFileDialog, QMessageBox
+        from datetime import datetime
+
+        show_id = database.db.GetActiveShow()
+        if show_id is None:
+            QMessageBox.warning(self, "Aucun show", "Aucun show actif.")
+            return
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        default_name = f"rapport_show_{timestamp}.pdf"
+        path, _ = QFileDialog.getSaveFileName(self, "Exporter en PDF", default_name, "PDF (*.pdf)")
+        if not path:
+            return
+
+        try:
+            export_show_to_pdf(show_id, path)
+            QMessageBox.information(self, "Export réussi", f"PDF exporté vers :\n{path}")
+        except Exception as e:
+            QMessageBox.critical(self, "Erreur export PDF", str(e))
+
     def lock_interface(self):
         from PySide6.QtWidgets import QWidget
         from PySide6.QtCore import Qt
