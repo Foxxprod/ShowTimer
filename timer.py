@@ -90,7 +90,10 @@ class PrompteurTimer(QObject):
                 self.fired_cue.emit(cue)
                 osc_state = database.db.GetOSCState()
                 if osc_state == "True":
-                    osc.osc_client.send(cue["osc_url"], cue["osc_args"])
+                    if cue["osc_url"] != "" and cue["osc_args"] != "":
+                        osc.osc_client.send(cue["osc_url"], cue["osc_args"])
+                    else:
+                        print(f"OSC non configuré pour ce cue: {cue['nom']} à {cue['temps']} ms")
                     print(f"Cue déclenché: {cue['nom']} à {cue['temps']} ms")
                 else:
                     print(f"OSC est desactive, cue non envoyé: {cue['nom']} à {cue['temps']} ms")
