@@ -125,6 +125,16 @@ class Database:
                 print(f"Erreur lors de la recuperation de l'emmsion dans la base de donnée: {e}")
                 return None
             
+    def DeleteAllCuesFromShow(self, show_id):
+        with self._lock:
+            try:
+                cursor = self.connection.cursor()
+                cursor.execute("DELETE FROM cues WHERE show_id = ?", (show_id,)) #supprime aussi les cues correspondant a l'emmsion
+                self.connection.commit()
+                print(f"Tous les cues de l'emmsion {show_id} ont ete supprime de la base de donnée.")
+            except sqlite3.Error as e:
+                print(f"Erreur lors de la suppression de tout les cues de l'emmsion dans la base de donnée: {e}")
+            
 
 
 
