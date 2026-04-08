@@ -1,0 +1,26 @@
+TITRE;DESCRIPTION;TEMPS;URL_OSC;ARG_OSC
+MISE EN PLACE;Noir et silence plateau;00:00;/sys/global;"standby"
+COUNTDOWN;Décompte visuel 10s;00:05;/gfx/overlay;"countdown_10"
+GENERIQUE;Générique animé + Musique;00:15;/audio/fader;1.0
+ACCROCHE;Présentateur face caméra 1;00:35;/cam/switch;1
+SOMMAIRE;Affichage des titres de l'émission;00:50;/gfx/lowerthird;"sommaire_full"
+CHRONIQUE 1;L'actu de la Silicon Valley;01:20;/gfx/overlay;"titre_actu"
+TRANSITION 1;Jingle court transition;02:00;/audio/sfx;"woosh"
+REPORTAGE 1;Lancement sujet "IA et Santé";02:10;/video/play;1
+TIME_REMINDER;Rappel temps restant reportage;03:30;/timer/info;"rep1_left"
+RETOUR PLATEAU;Analyse en plateau (Cam 2);04:45;/cam/switch;2
+INFOGRAPHIE;Données statistiques à l'écran;05:15;/gfx/overlay;"stats_ia"
+APPEL TEMOIN;Lancement duplex Skype/Zoom;05:50;/network/call;"remote_1"
+INTERVIEW PART 1;Questions sur le déploiement;06:30;/cam/switch;3
+INTERVIEW PART 2;Réactions aux chiffres;07:15;/gfx/lowerthird;"nom_invite"
+TRANSITION 2;Jingle sonore milieu d'émission;07:50;/audio/sfx;"jingle_mid"
+CHRONIQUE 2;Le test produit de la semaine;08:00;/cam/switch;1
+DEMO LIVE;Démonstration gadget sur table;08:45;/cam/switch;4
+QUESTION PUBLIC;Lecture des tweets;09:30;/gfx/overlay;"social_wall"
+DEBAT;Discussion rapide (3 intervenants);10:15;/light/scene;"debate_warm"
+SYNTHESE;Point clé à retenir;11:00;/gfx/lowerthird;"key_points"
+Derniere Minute;Alerte fin de plateau;12:00;/timer/warning;"1min"
+CONCLUSION;Mot de la fin et remerciements;12:15;/cam/switch;1
+CREDITS;Défilement du générique de fin;12:40;/gfx/scroll;"credits"
+LOGOS;Logos partenaires et chaîne;12:55;/gfx/overlay;"partners"
+BLACKOUT;Fin de flux - Noir antenne;13:00;/sys/global;"black"

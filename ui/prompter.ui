@@ -77,57 +77,50 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="second_cue">
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>30</pointsize>
-         <italic>false</italic>
-         <bold>true</bold>
-        </font>
+      <widget class="QWidget" name="second_cue" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <property name="text">
-        <string>SECOND CUE</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>65</height>
+        </size>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="next_cue">
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>60</pointsize>
-         <bold>true</bold>
-        </font>
+      <widget class="QWidget" name="next_cue" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="text">
-        <string>NEXT CUE</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>120</height>
+        </size>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="show_remain_time">
-       <property name="font">
-        <font>
-         <family>Arial</family>
-         <pointsize>30</pointsize>
-         <bold>true</bold>
-        </font>
+      <widget class="QWidget" name="clock_label" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <property name="text">
-        <string>REMAIN TIME</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignCenter</set>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>65</height>
+        </size>
        </property>
       </widget>
      </item>

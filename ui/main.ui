@@ -6,174 +6,518 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>848</width>
-    <height>544</height>
+    <width>521</width>
+    <height>572</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">/* ============================================================
+   GLOBAL QSS — TIMER PCP — Modern Dark Theme
+   ============================================================ */
+
+/* === BASE === */
+QWidget {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    font-family: &quot;Segoe UI&quot;;
+    font-size: 12px;
+}
+
+QMainWindow, QDialog {
+    background-color: #1e1e1e;
+}
+
+/* === MENU BAR === */
+QMenuBar {
+    background-color: #161616;
+    color: #e0e0e0;
+    padding: 2px;
+    border-bottom: 1px solid #2d2d2d;
+}
+QMenuBar::item:selected {
+    background-color: #0078d4;
+    border-radius: 3px;
+}
+QMenu {
+    background-color: #252525;
+    color: #e0e0e0;
+    border: 1px solid #3a3a3a;
+    padding: 4px 0px;
+}
+QMenu::item {
+    padding: 6px 20px;
+}
+QMenu::item:selected {
+    background-color: #0078d4;
+}
+QMenu::separator {
+    height: 1px;
+    background-color: #3a3a3a;
+    margin: 4px 8px;
+}
+
+/* === TAB WIDGET === */
+QTabWidget::pane {
+    background-color: #252525;
+    border: none;
+    border-top: 2px solid #0078d4;
+}
+QTabBar {
+    background-color: #161616;
+}
+QTabBar::tab {
+    background-color: transparent;
+    color: #aaaaaa;
+    padding: 7px 18px;
+    font-size: 12px;
+    border: none;
+    min-width: 70px;
+}
+QTabBar::tab:selected {
+    background-color: #252525;
+    color: #ffffff;
+    font-weight: bold;
+    border-top: 2px solid #0078d4;
+}
+QTabBar::tab:hover:!selected {
+    background-color: rgba(255,255,255,0.06);
+    color: #ffffff;
+}
+
+/* === BOUTONS === */
+QPushButton {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+    border: 1px solid #3a3a3a;
+    border-radius: 5px;
+    padding: 6px 14px;
+    font-size: 12px;
+}
+QPushButton:hover {
+    background-color: #0078d4;
+    border-color: #0078d4;
+    color: #ffffff;
+}
+QPushButton:pressed {
+    background-color: #005a9e;
+    border-color: #005a9e;
+}
+QPushButton:disabled {
+    background-color: #1e1e1e;
+    color: #555555;
+    border-color: #2a2a2a;
+}
+
+/* === CHAMPS TEXTE === */
+QLineEdit, QTextEdit, QPlainTextEdit {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #3a3a3a;
+    border-radius: 4px;
+    padding: 5px 8px;
+    selection-background-color: #0078d4;
+}
+QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus {
+    border: 1px solid #0078d4;
+}
+
+/* === LABELS === */
+QLabel {
+    color: #e0e0e0;
+    background-color: transparent;
+}
+
+/* === TABLEAUX === */
+QTableWidget, QTableView {
+    background-color: #252525;
+    color: #e0e0e0;
+    border: 1px solid #3a3a3a;
+    gridline-color: #2d2d2d;
+    selection-background-color: #0078d4;
+    selection-color: #ffffff;
+    alternate-background-color: #2a2a2a;
+}
+QTableWidget::item, QTableView::item {
+    padding: 4px 6px;
+}
+QHeaderView::section {
+    background-color: #1a1a1a;
+    color: #aaaaaa;
+    border: none;
+    border-right: 1px solid #2d2d2d;
+    border-bottom: 1px solid #3a3a3a;
+    padding: 5px 8px;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+/* === COMBOBOX === */
+QComboBox {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #3a3a3a;
+    border-radius: 4px;
+    padding: 5px 8px;
+}
+QComboBox:hover {
+    border-color: #0078d4;
+}
+QComboBox::drop-down {
+    border: none;
+    width: 20px;
+}
+QComboBox QAbstractItemView {
+    background-color: #252525;
+    color: #e0e0e0;
+    border: 1px solid #3a3a3a;
+    selection-background-color: #0078d4;
+}
+
+/* === SPINBOX === */
+QSpinBox, QDoubleSpinBox {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #3a3a3a;
+    border-radius: 4px;
+    padding: 4px 6px;
+}
+QSpinBox:focus, QDoubleSpinBox:focus {
+    border-color: #0078d4;
+}
+
+/* === CHECKBOX === */
+QCheckBox {
+    color: #e0e0e0;
+    spacing: 8px;
+    background-color: transparent;
+}
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #555555;
+    border-radius: 3px;
+    background-color: #2a2a2a;
+}
+QCheckBox::indicator:checked {
+    background-color: #0078d4;
+    border-color: #0078d4;
+}
+QCheckBox::indicator:hover {
+    border-color: #0078d4;
+}
+
+/* === PROGRESS BAR === */
+QProgressBar {
+    background-color: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    border-radius: 5px;
+    text-align: center;
+    color: #e0e0e0;
+    font-size: 11px;
+}
+QProgressBar::chunk {
+    background-color: #0078d4;
+    border-radius: 4px;
+}
+
+/* === SCROLLBAR === */
+QScrollBar:vertical {
+    background-color: #1e1e1e;
+    width: 10px;
+    border: none;
+}
+QScrollBar::handle:vertical {
+    background-color: #3a3a3a;
+    border-radius: 5px;
+    min-height: 30px;
+}
+QScrollBar::handle:vertical:hover {
+    background-color: #0078d4;
+}
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+QScrollBar:horizontal {
+    background-color: #1e1e1e;
+    height: 10px;
+    border: none;
+}
+QScrollBar::handle:horizontal {
+    background-color: #3a3a3a;
+    border-radius: 5px;
+    min-width: 30px;
+}
+QScrollBar::handle:horizontal:hover {
+    background-color: #0078d4;
+}
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    width: 0px;
+}
+
+/* === SEPARATEURS === */
+QFrame[frameShape=&quot;4&quot;],
+QFrame[frameShape=&quot;5&quot;] {
+    color: #2d2d2d;
+}
+
+/* === GROUP BOX === */
+QGroupBox {
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    margin-top: 12px;
+    padding-top: 8px;
+    color: #aaaaaa;
+    font-size: 11px;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 4px;
+}
+
+/* === TOOLTIP === */
+QToolTip {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+    border: 1px solid #0078d4;
+    border-radius: 3px;
+    padding: 4px 8px;
+}
+</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QTableView" name="show_table_view">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
+   <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>821</width>
-      <height>421</height>
+      <width>251</width>
+      <height>31</height>
      </rect>
     </property>
-    <property name="editTriggers">
-     <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+    <property name="styleSheet">
+     <string notr="true">QLabel {
+    font-size: 30px;
+    font-weight: bold;
+}
+</string>
     </property>
-    <property name="selectionBehavior">
-     <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+    <property name="text">
+     <string>SHOW TIMER V1</string>
     </property>
    </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget">
+   <widget class="QPushButton" name="pushButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>10</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>icon/icon.png</normaloff>
+      <disabledoff>icon/icon.png</disabledoff>icon/icon.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>50</width>
+      <height>50</height>
+     </size>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>430</y>
-      <width>821</width>
-      <height>81</height>
+      <y>510</y>
+      <width>191</width>
+      <height>16</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QToolButton" name="open_show">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>OUVRIR</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>icon/32x32_ok.png</normaloff>icon/32x32_ok.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="add_show">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>CREER NOUVEAU</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>icon/32x32_plus.png</normaloff>icon/32x32_plus.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="modify_show">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>MODIFIER</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>icon/32x32_configuration.png</normaloff>icon/32x32_configuration.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="delete_show">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>SUPPRIMER</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>icon/32x32_close.png</normaloff>icon/32x32_close.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>32</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
+    <property name="text">
+     <string>© FoxxProd 2026 - ShowTimer 1.0</string>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>501</width>
+      <height>431</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Selectionnez une emission a ouvrir / modifier / supprimer</string>
+    </property>
+    <widget class="QTableView" name="show_table_view">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>481</width>
+       <height>311</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QTableWidget::item:selected {
+    background-color: #2ECC71;
+    color: white;
+}
+</string>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+     </property>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>340</y>
+       <width>481</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QToolButton" name="open_show">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>OUVRIR</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icon/32x32_ok.png</normaloff>icon/32x32_ok.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="add_show">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>CREER NOUVEAU</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icon/32x32_plus.png</normaloff>icon/32x32_plus.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="modify_show">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>MODIFIER</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icon/32x32_configuration.png</normaloff>icon/32x32_configuration.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="delete_show">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>SUPPRIMER</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icon/32x32_close.png</normaloff>icon/32x32_close.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="Line" name="line">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>50</y>
+      <width>511</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Orientation::Horizontal</enum>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -181,8 +525,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>848</width>
-     <height>33</height>
+     <width>521</width>
+     <height>37</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuConfig">
