@@ -26,14 +26,15 @@
 #--------------------------------------------------------------------------------------------------------------------
 import database, utils, osc
 import sys, threading
+from timeline import TimelineWidget
 from ui.ui_main import Ui_MainWindow
 from ui.ui_operator import Ui_Dialog as Ui_OperatorDialog
 from prompter import PrompterWindow
-from prompter_settings_dialog import PrompterSettingsDialog
+from utils import PrompterSettingsDialog
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit, QTextEdit, QHBoxLayout, QGridLayout, QMessageBox, QDialog
 from PySide6.QtGui import QStandardItemModel, QStandardItem
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QTimer, QTime
 from PySide6.QtGui import QShortcut, QKeySequence
 from PySide6.QtGui import QIcon
 
@@ -60,10 +61,26 @@ class MainWindow(QMainWindow):
         self.ui.actionConfig_prompter.triggered.connect(self.change_prompter_config) #quand on clique sur le menu de configuration du prompteur, on affiche la fenetre de configuration du prompteur
 
         ######BOUTON#######
-        self.ui.delete_show.clicked.connect(self.delete_show) #quand on clique sur le bouton de suppression d'une emmsion, on appelle la fonction de suppression d'une emmsion dans la db, en lui passant l'id de l'emmsion selectionné.
-        self.ui.add_show.clicked.connect(self.create_show) #quand on clique sur le bouton de création d'une emmsion, on affiche la fenetre de création d'une emmsion
-        self.ui.modify_show.clicked.connect(self.modify_show) #quand on clique sur le bouton de modification d'une emmsion, on affiche la fenetre de modification d'une emmsion, en lui passant l'id de l'emmsion selectionné.
-        self.ui.open_show.clicked.connect(self.open_show) #quand on clique sur le bouton d'ouverture d'une emmsion, on affiche l'interface de controle de l'emmsion
+        self.ui.delete_show.clicked.connect(self.delete_show)
+        self.ui.add_show.clicked.connect(self.create_show)
+        self.ui.modify_show.clicked.connect(self.modify_show)
+        self.ui.open_show.clicked.connect(self.open_show)
+
+        ######TABLEAU######
+        self.ui.show_table_view.doubleClicked.connect(self.open_show)
+        self.ui.show_table_view.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.show_table_view.customContextMenuRequested.connect(self.show_table_context_menu)
+
+    def show_table_context_menu(self, pos):
+        from PySide6.QtWidgets import QMenu
+        if not self.ui.show_table_view.indexAt(pos).isValid():
+            return
+        menu = QMenu(self)
+        menu.addAction("Ouvrir", self.open_show)
+        menu.addAction("Modifier", self.modify_show)
+        menu.addSeparator()
+        menu.addAction("Supprimer", self.delete_show)
+        menu.exec(self.ui.show_table_view.viewport().mapToGlobal(pos))
 
     def update_shows_table(self):
         # Supprime le modèle existant avant de reconstruire
@@ -95,8 +112,16 @@ class MainWindow(QMainWindow):
                 model.setItem(row_idx, col_idx, item)
 
                 self.ui.show_table_view.setModel(model)
-                self.ui.show_table_view.horizontalHeader().setStretchLastSection(True)
-                self.ui.show_table_view.resizeColumnsToContents()
+
+        from PySide6.QtWidgets import QHeaderView
+        header = self.ui.show_table_view.horizontalHeader()
+        header.setStretchLastSection(False)
+        for i in range(model.columnCount()):
+            col_name = model.horizontalHeaderItem(i).text()
+            if col_name == "description":
+                header.setSectionResizeMode(i, QHeaderView.Stretch)
+            else:
+                header.setSectionResizeMode(i, QHeaderView.ResizeToContents)
 
         self.ui.show_table_view.selectionModel().selectionChanged.connect(self.on_show_selected) #reconnecte le signal apres MAJ, sinon plus possible de selec un show...
 
@@ -192,25 +217,41 @@ class OperatorDialog(QDialog):
         self.setModal(False)
         
 
-        self.duree_totale_ms = self.get_total_time()
-        self.derniere_seconde_affichee = -1
+        self.duree_totale_ms = self.get_total_time()  #duree totale de l'emmision
+        self.derniere_seconde_affichee = -1 #derniere seconde affichée
         self.last_next_cues = [] 
 
         self.load_screens()
 
-        self.config_table()
-        self.config_timer()
-        self.fill_table()
+        self.config_table() #config le tableau des cues
+        self.config_timer() #confiog le timer, a partir du temps global de l'emmision
+        self.fill_table() #remplit le tableau des cues
         self.update_buttons_state("stopped")  # état initial
+        self.config_timeline()
 
-        self.ui.osc_active.toggled.connect(self.change_osc_activ_state)
+        self.load_osc_active_in_ui() #met a jour la case a cocher de l'osc et les deux label 
+        self.load_data_in_ui() #affiche le nom, la desc et le temp du show dans l'ui
 
-        self.load_osc_active_in_ui()
+        
+
+        ########BARRE DE FONCTIONS - MENU FICHIER########
+        self.ui.quit.clicked.connect(self.close)
+        self.ui.lock.clicked.connect(self.lock_interface)
+        self.ui.excel_import.clicked.connect(lambda: self.import_from_file("excel"))
+        self.ui.csv_import.clicked.connect(lambda: self.import_from_file("csv"))
+        self.ui.excel_export.clicked.connect(lambda: self.export_cues("excel"))
+        self.ui.csv_export.clicked.connect(lambda: self.export_cues("csv"))
+
+
+        ############BARRE DE FONCTIONS - MENU OSC########
+        self.ui.osc_active.toggled.connect(self.change_osc_activ_state) #activer / desactiver l'osc
+        self.ui.osc_config.clicked.connect(self.change_osc_config) #quand on clique sur le menu de configuration OSC, on affiche la fenetre de configuration OSC, quand fermé, mise a jour de l'ui
+        self.ui.osc_ping.clicked.connect(self.test_osc)
 
 
         self.ui.cue_table_widget.setStyleSheet("""
             QTableWidget::item:selected {
-                background-color: #00E32A;
+                background-color: #0078d4;
                 color: white;
             }
         """)
@@ -222,6 +263,8 @@ class OperatorDialog(QDialog):
         self.ui.screen_selection.currentIndexChanged.connect(self.screen_selection_changed) #changer l'ecran d'affichage du prompteur 
         self.ui.fullscreen.toggled.connect(self.fullscreen_state_changed) #activer / desactiver le plein ecran du prompteur
 
+        self.ui.prompter_config.clicked.connect(self.config_prompter)
+
         self.prompteur_window.closed_window.connect(
             lambda: self.ui.screen_active.setChecked(False)
         )
@@ -230,6 +273,7 @@ class OperatorDialog(QDialog):
             lambda checked: self.ui.fullscreen.setChecked(checked)
         )
 
+        self.ui.prompt_textedit.setPlaceholderText("Saisissez ici un texte à afficher sur le prompteur...")
         self.ui.prompt_textedit.textChanged.connect(
             lambda: self.prompteur_window.set_prompt_text(self.ui.prompt_textedit.toPlainText())
         )
@@ -244,17 +288,80 @@ class OperatorDialog(QDialog):
         self.ui.prompt_highlight.clicked.connect(self.prompteur_window.start_blink)
         self.ui.prompt_clear.clicked.connect(lambda: self.ui.prompt_textedit.clear())
 
+        self.ui.prompt_highlight_2.clicked.connect(self.prompteur_window.start_blink)
+        self.ui.prompt_clear_2.clicked.connect(lambda: self.ui.prompt_textedit.clear())
+
         #########Raccourcis clavier##########
         QShortcut(QKeySequence("F1"), self).activated.connect(self.ui.prompt_textedit.clear)  # Efface le texte du prompteur
         QShortcut(QKeySequence("F2"), self).activated.connect(self.prompteur_window.start_blink)  # Fait clignoter le prompteur
 
 
-        ########BOURON GESTION DES CUES#############"
+        ########BOUTONS GESTION DES CUES#############
         self.ui.add_cue.clicked.connect(lambda: self.add_cue_function())
         self.ui.modify_cue.clicked.connect(lambda: self.modify_cue_function())
         self.ui.delete_cue.clicked.connect(lambda: self.delete_cue_function())
+        self.ui.delete_all_cues.clicked.connect(lambda: self.delete_all_cues_function())
 
-    ###################PARAMETRE DU PROMPTEUR########################################3
+        ########ZOOM TABLEAU########
+        self.ui.zoom_spin.setMinimum(50)
+        self.ui.zoom_spin.setMaximum(200)
+        self.ui.zoom_spin.setValue(100)
+        self.ui.zoom_spin.setSuffix(" %")
+        self.ui.zoom_spin.setSingleStep(5)
+        self.ui.zoom.clicked.connect(self.zoom_in_table)
+        self.ui.unzoom.clicked.connect(self.zoom_out_table)
+        self.ui.zoom_spin.valueChanged.connect(self.on_zoom_changed)
+
+    ##################INITIALISATION DES DONNEES DU SHOW#######################
+    def load_data_in_ui(self):
+        try:
+            data = database.db.GetShowById(database.db.GetActiveShow())
+
+            self.ui.show_title.setText(data["nom"])
+            self.ui.show_desc.setText(data["description"])
+            
+            total_ms = data["duree"]
+            total_sec = total_ms // 1000
+            minutes = total_sec // 60
+            seconds = total_sec % 60
+            self.ui.show_total_time.setTime(QTime(0, minutes, seconds))
+
+
+        except Exception as e:
+            print(e)
+            QMessageBox.critical(self, "Erreur", "Impossible de charger les données de l'emmsion dans l'interface.")
+
+    ###################PARAMETRE DU PROMPTEUR########################################
+    def config_prompter(self):
+        if self.prompteur_window.isVisible():
+            reply = QMessageBox.question(
+                self,
+                "Paramètres prompteur",
+                "La fenêtre du prompteur va être fermée puis relancée pour appliquer les modifications.\n\nContinuer ?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No
+            )
+            if reply == QMessageBox.No:
+                return
+
+        was_visible = self.prompteur_window.isVisible()
+        was_fullscreen = self.ui.fullscreen.isChecked()
+        screen_index = self.ui.screen_selection.currentIndex()
+        key_color = self.ui.key_mode.currentData()
+        if PrompterSettingsDialog(self).exec_():
+            if self.prompteur_window:
+                self.prompteur_window.close()
+                self.prompteur_window = PrompterWindow(self.timer, self.duree_totale_ms)
+                if was_visible:
+                    self.prompteur_window.set_screen(self.ui.screen_selection.itemData(screen_index))
+                    self.prompteur_window.set_background_color(key_color)
+                    if was_fullscreen:
+                        self.prompteur_window.set_fullscreen(True)
+                    else:
+                        self.prompteur_window.show()
+                    self.ui.screen_active.setChecked(True)
+
+
     def checkbox_screen_active(self, checked):
         if checked:
             self.prompteur_window.show()
@@ -275,6 +382,7 @@ class OperatorDialog(QDialog):
     ##################ACTIVATION OU NON DE L'ENVOIE OSC#################################
     def change_osc_activ_state(self, state):
         state = self.ui.osc_active.isChecked()
+
         if state == True:
             database.db.SetOSCState("True")
         else:
@@ -289,9 +397,62 @@ class OperatorDialog(QDialog):
             state = False
             self.ui.osc_active.setChecked(state)
 
+        osc_ip, osc_port =  database.db.GetOSCConfig()
+        
+        self.ui.osc_server_ip.setText(osc_ip)
+        self.ui.osc_server_port.setValue(int(osc_port))
+
+    def change_osc_config(self):
+        if utils.ModifyOSCConfigDialog().exec():
+            self.load_osc_active_in_ui()
+    
+
+    def test_osc(self):
+        try:
+            print("test_osc")
+            osc.osc_client.send("/test", 1)
+            QMessageBox.information(self, "Test OSC", "Message /test avec l'argument int 1 envoyé au serveur OSC")
+
+        except Exception as e:
+            QMessageBox.critical(self, "Test OSC", f"Une erreur s'est produite lors du test OSC : {str(e)}")
 
 
 
+
+
+
+
+    def cue_table_context_menu(self, pos):
+        from PySide6.QtWidgets import QMenu
+        menu = QMenu(self)
+        menu.addAction("Ajouter un cue", self.add_cue_function)
+
+        if self.ui.cue_table_widget.indexAt(pos).isValid() and self.selected_cue_id is not None:
+            menu.addSeparator()
+            menu.addAction("Modifier", self.modify_cue_function)
+            menu.addSeparator()
+            menu.addAction("Déclencher OSC manuellement", self.fire_cue_osc_manually)
+            menu.addSeparator()
+            menu.addAction("Supprimer", self.delete_cue_function)
+
+        menu.exec(self.ui.cue_table_widget.viewport().mapToGlobal(pos))
+
+    def fire_cue_osc_manually(self):
+        if self.selected_cue_id is None:
+            return
+        cue = database.db.GetCueById(self.selected_cue_id)
+        if not cue:
+            return
+        osc_url = cue.get("osc_url", "")
+        osc_args = cue.get("osc_args", "")
+        if not osc_url:
+            QMessageBox.warning(self, "Pas de commande OSC", "Ce cue n'a pas de commande OSC définie.")
+            return
+        try:
+            osc.osc_client.send(osc_url, osc_args)
+            QMessageBox.information(self, "OSC envoyé", f"Commande envoyée :\n{osc_url}  {osc_args}")
+        except Exception as e:
+            QMessageBox.critical(self, "Erreur OSC", f"Impossible d'envoyer la commande OSC :\n{e}")
 
     #####################################################################################
     def add_cue_function(self):
@@ -333,6 +494,25 @@ class OperatorDialog(QDialog):
         else:
             print("Suppression annulée.")
 
+    def delete_all_cues_function(self):
+        try:
+            reply = QMessageBox.question(
+                self,
+                "Confirmer la suppression",
+                "Voulez-vous vraiment supprimer tous les cues de l'emission actuelle ?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No
+            )
+
+            if reply == QMessageBox.Yes:
+                print("Suppression confirmée.")
+                database.db.DeleteAllCuesFromShow(database.db.GetActiveShow())
+                self.fill_table()  # rafraîchit le tableau apres la suppression de tous les cues
+            else:
+                print("Suppression annulée.")
+        except Exception as e:
+            QMessageBox.critical(self, "Erreur", f"Une erreur s'est produite lors de la suppression de tous les cues : {str(e)}")
+
     
     def update_buttons_state(self, etat):
         """
@@ -354,6 +534,40 @@ class OperatorDialog(QDialog):
             self.ui.timer_pause.setEnabled(False)
             self.ui.timer_stop.setEnabled(True)
 
+    def config_timeline(self):
+        self.timeline = TimelineWidget(self.duree_totale_ms, self.ui.TIMELINE)
+        self.timeline.setGeometry(self.ui.TIMELINE.rect())
+        self.timer.updated_time.connect(self.timeline.set_position)
+        cues = database.db.GetAllCuesFromShow(database.db.GetActiveShow()) or []
+        self.timeline.set_cues(cues)
+
+    def zoom_in_table(self):
+        val = self.ui.zoom_spin.value()
+        self.ui.zoom_spin.setValue(min(val + 5, 200))
+
+    def zoom_out_table(self):
+        val = self.ui.zoom_spin.value()
+        self.ui.zoom_spin.setValue(max(val - 5, 50))
+
+    def on_zoom_changed(self, percent):
+        base_font_size = 11
+        base_row_height = 26
+        new_size = max(6, round(base_font_size * percent / 100))
+        new_row_h = round(base_row_height * percent / 100)
+
+        font = self.ui.cue_table_widget.font()
+        font.setPointSize(new_size)
+        self.ui.cue_table_widget.setFont(font)
+        self.ui.cue_table_widget.horizontalHeader().setFont(font)
+        self.ui.cue_table_widget.verticalHeader().setDefaultSectionSize(new_row_h)
+
+        # Applique la police sur chaque cellule existante
+        for row in range(self.ui.cue_table_widget.rowCount()):
+            for col in range(self.ui.cue_table_widget.columnCount()):
+                item = self.ui.cue_table_widget.item(row, col)
+                if item:
+                    item.setFont(font)
+
     def config_table(self):
         from PySide6.QtWidgets import QTableWidget, QHeaderView
         self.ui.cue_table_widget.setColumnCount(6)
@@ -369,6 +583,8 @@ class OperatorDialog(QDialog):
 
         self.selected_cue_id = None
         self.ui.cue_table_widget.itemSelectionChanged.connect(self.on_cue_selected)
+        self.ui.cue_table_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.ui.cue_table_widget.customContextMenuRequested.connect(self.cue_table_context_menu)
 
     def config_timer(self):
         from timer import PrompteurTimer
@@ -402,6 +618,9 @@ class OperatorDialog(QDialog):
             return
 
         cues = database.db.GetAllCuesFromShow(show_id) or []
+
+        if hasattr(self, "timeline"):
+            self.timeline.set_cues(cues)
 
         for cue in sorted(cues, key=lambda c: c["temps"]):
             ligne = self.ui.cue_table_widget.rowCount()
@@ -439,6 +658,11 @@ class OperatorDialog(QDialog):
         if item_nom:
             self.selected_cue_id = item_nom.data(Qt.UserRole + 1)
             print(f"Cue sélectionné - ID : {self.selected_cue_id}")
+
+            # Basculer sur l'onglet Cues
+            index = self.ui.tabWidget.indexOf(self.ui.tab)
+            if index >= 0:
+                self.ui.tabWidget.setCurrentIndex(index)
 
             #quand un cue est sélectionné, on active les boutons de modification et de suppression de cue
             self.ui.modify_cue.setEnabled(True)
@@ -495,6 +719,7 @@ class OperatorDialog(QDialog):
         self.ui.remaining_time.setText("00:00:00")
         self.ui.remaining_time.setStyleSheet("")
         self.ui.progressBar.setValue(0)
+        self.prompteur_window._reset_affichage()
 
         show_id = database.db.GetActiveShow()
         if show_id is not None:
@@ -632,6 +857,125 @@ class OperatorDialog(QDialog):
                 f"Écran {i} - {nom} ({resolution.width()}x{resolution.height()})",
                 userData=i  # on stocke le numéro de l'écran dans le userData
             )
+
+    def import_from_file(self, mode):
+        dialog = utils.ImportExcelDialog(self)
+        # Pré-filtrer selon le bouton utilisé
+        if mode == "excel":
+            dialog._browse_filter = "Excel (*.xlsx *.xls)"
+        else:
+            dialog._browse_filter = "CSV (*.csv)"
+        if dialog.exec():
+            show_id = database.db.GetActiveShow()
+            for cue in dialog.cues:
+                database.db.AddCueToShow(
+                    show_id,
+                    cue["nom"],
+                    cue["description"],
+                    cue["temps"],
+                    cue["osc_url"],
+                    cue["osc_args"],
+                    "#161A16"
+                )
+            cues = database.db.GetAllCuesFromShow(show_id) or []
+            self.timer.set_cues(cues)
+            self.fill_table()
+            QMessageBox.information(self, "Import réussi", f"{len(dialog.cues)} cue(s) importé(s).")
+
+    def export_cues(self, mode):
+        from PySide6.QtWidgets import QFileDialog, QMessageBox
+        from datetime import datetime  # Ajout pour la date et l'heure
+
+        show_id = database.db.GetActiveShow()
+        if show_id is None:
+            QMessageBox.warning(self, "Aucun show", "Aucun show actif.")
+            return
+
+        cues = database.db.GetAllCuesFromShow(show_id) or []
+        if not cues:
+            QMessageBox.warning(self, "Aucun cue", "Aucun cue à exporter.")
+            return
+
+        # Génération du suffixe date_heure
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        def ms_to_mmss(ms):
+            m = ms // 60000
+            s = (ms % 60000) // 1000
+            return f"{m:02d}:{s:02d}"
+
+        rows = [["TITRE", "DESCRIPTION", "TEMPS", "URL_OSC", "ARG_OSC"]]
+        for cue in sorted(cues, key=lambda c: c["temps"]):
+            rows.append([
+                cue.get("nom", ""),
+                cue.get("description", ""),
+                ms_to_mmss(cue.get("temps", 0)),
+                cue.get("osc_url", ""),
+                str(cue.get("osc_args", "") or ""),
+            ])
+
+        if mode == "excel":
+            default_name = f"cues_export_{timestamp}.xlsx"
+            path, _ = QFileDialog.getSaveFileName(self, "Exporter en Excel", default_name, "Excel (*.xlsx)")
+            
+            if not path:
+                return
+                
+            import openpyxl
+            from openpyxl.styles import Font, PatternFill
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = "Cues"
+            for i, row in enumerate(rows):
+                ws.append(row)
+                if i == 0:
+                    for cell in ws[1]:
+                        cell.font = Font(bold=True, color="FFFFFF")
+                        cell.fill = PatternFill("solid", fgColor="0078D4")
+            
+            ws.column_dimensions["A"].width = 25
+            ws.column_dimensions["B"].width = 40
+            ws.column_dimensions["C"].width = 12
+            ws.column_dimensions["D"].width = 30
+            ws.column_dimensions["E"].width = 12
+            wb.save(path)
+
+        elif mode == "csv":
+            default_name = f"cues_export_{timestamp}.csv"
+            path, _ = QFileDialog.getSaveFileName(self, "Exporter en CSV", default_name, "CSV (*.csv)")
+            
+            if not path:
+                return
+                
+            import csv
+            with open(path, "w", newline="", encoding="utf-8-sig") as f:
+                writer = csv.writer(f, delimiter=";")
+                writer.writerows(rows)
+
+        QMessageBox.information(self, "Export réussi", f"{len(cues)} cue(s) exporté(s) vers :\n{path}")
+   
+   
+    def lock_interface(self):
+        from PySide6.QtWidgets import QWidget
+        from PySide6.QtCore import Qt
+
+        # Overlay gris semi-transparent par dessus la fenêtre
+        overlay = QWidget(self)
+        overlay.setGeometry(self.rect())
+        overlay.setStyleSheet("background-color: rgba(0, 0, 0, 160);")
+        overlay.setAttribute(Qt.WA_TransparentForMouseEvents, False)
+        overlay.show()
+        overlay.raise_()
+
+        dialog = utils.LockDialog(self)
+        # Centrer sur la fenêtre opérateur
+        geo = self.geometry()
+        dx = geo.x() + (geo.width() - dialog.width()) // 2
+        dy = geo.y() + (geo.height() - dialog.height()) // 2
+        dialog.move(dx, dy)
+        dialog.exec()
+
+        overlay.deleteLater()
 
     def closeEvent(self, event):
         reponse = QMessageBox.question(
