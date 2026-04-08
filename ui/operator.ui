@@ -6,132 +6,297 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1300</width>
-    <height>746</height>
+    <width>1279</width>
+    <height>862</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QWidget" name="verticalLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>20</y>
-     <width>698</width>
-     <height>151</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="2">
-       <widget class="QLabel" name="pass_time">
-        <property name="font">
-         <font>
-          <pointsize>30</pointsize>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="layoutDirection">
-         <enum>Qt::LayoutDirection::RightToLeft</enum>
-        </property>
-        <property name="text">
-         <string>00:00:00</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="label_5">
-        <property name="font">
-         <font>
-          <pointsize>30</pointsize>
-          <italic>true</italic>
-         </font>
-        </property>
-        <property name="text">
-         <string>Temps écoulé :</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLabel" name="label_7">
-        <property name="font">
-         <font>
-          <pointsize>30</pointsize>
-          <italic>true</italic>
-         </font>
-        </property>
-        <property name="text">
-         <string>Temps restant :</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QLabel" name="remaining_time">
-        <property name="font">
-         <font>
-          <pointsize>30</pointsize>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="layoutDirection">
-         <enum>Qt::LayoutDirection::RightToLeft</enum>
-        </property>
-        <property name="text">
-         <string>00:00:00</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <widget class="QProgressBar" name="progressBar">
-      <property name="maximum">
-       <number>100</number>
-      </property>
-      <property name="value">
-       <number>0</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Orientation::Horizontal</enum>
-      </property>
-      <property name="invertedAppearance">
-       <bool>false</bool>
-      </property>
-      <property name="textDirection">
-       <enum>QProgressBar::Direction::BottomToTop</enum>
-      </property>
-      <property name="format">
-       <string/>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QTableWidget" name="cue_table_widget">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>180</y>
-     <width>831</width>
-     <height>491</height>
-    </rect>
-   </property>
-  </widget>
+  <property name="styleSheet">
+   <string notr="true">/* ============================================================
+   GLOBAL QSS — TIMER PCP — Modern Dark Theme
+   ============================================================ */
+
+/* === BASE === */
+QWidget {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    font-family: &quot;Segoe UI&quot;;
+    font-size: 12px;
+}
+
+QMainWindow, QDialog {
+    background-color: #1e1e1e;
+}
+
+/* === MENU BAR === */
+QMenuBar {
+    background-color: #161616;
+    color: #e0e0e0;
+    padding: 2px;
+    border-bottom: 1px solid #2d2d2d;
+}
+QMenuBar::item:selected {
+    background-color: #0078d4;
+    border-radius: 3px;
+}
+QMenu {
+    background-color: #252525;
+    color: #e0e0e0;
+    border: 1px solid #3a3a3a;
+    padding: 4px 0px;
+}
+QMenu::item {
+    padding: 6px 20px;
+}
+QMenu::item:selected {
+    background-color: #0078d4;
+}
+QMenu::separator {
+    height: 1px;
+    background-color: #3a3a3a;
+    margin: 4px 8px;
+}
+
+/* === TAB WIDGET === */
+QTabWidget::pane {
+    background-color: #252525;
+    border: none;
+    border-top: 2px solid #0078d4;
+}
+QTabBar {
+    background-color: #161616;
+}
+QTabBar::tab {
+    background-color: transparent;
+    color: #aaaaaa;
+    padding: 7px 18px;
+    font-size: 12px;
+    border: none;
+    min-width: 70px;
+}
+QTabBar::tab:selected {
+    background-color: #252525;
+    color: #ffffff;
+    font-weight: bold;
+    border-top: 2px solid #0078d4;
+}
+QTabBar::tab:hover:!selected {
+    background-color: rgba(255,255,255,0.06);
+    color: #ffffff;
+}
+
+/* === BOUTONS === */
+QPushButton {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+    border: 1px solid #3a3a3a;
+    border-radius: 5px;
+    padding: 6px 14px;
+    font-size: 12px;
+}
+QPushButton:hover {
+    background-color: #0078d4;
+    border-color: #0078d4;
+    color: #ffffff;
+}
+QPushButton:pressed {
+    background-color: #005a9e;
+    border-color: #005a9e;
+}
+QPushButton:disabled {
+    background-color: #1e1e1e;
+    color: #555555;
+    border-color: #2a2a2a;
+}
+
+/* === CHAMPS TEXTE === */
+QLineEdit, QTextEdit, QPlainTextEdit {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #3a3a3a;
+    border-radius: 4px;
+    padding: 5px 8px;
+    selection-background-color: #0078d4;
+}
+QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus {
+    border: 1px solid #0078d4;
+}
+
+/* === LABELS === */
+QLabel {
+    color: #e0e0e0;
+    background-color: transparent;
+}
+
+/* === TABLEAUX === */
+QTableWidget, QTableView {
+    background-color: #252525;
+    color: #e0e0e0;
+    border: 1px solid #3a3a3a;
+    gridline-color: #2d2d2d;
+    selection-background-color: #0078d4;
+    selection-color: #ffffff;
+    alternate-background-color: #2a2a2a;
+}
+QTableWidget::item, QTableView::item {
+    padding: 4px 6px;
+}
+QHeaderView::section {
+    background-color: #1a1a1a;
+    color: #aaaaaa;
+    border: none;
+    border-right: 1px solid #2d2d2d;
+    border-bottom: 1px solid #3a3a3a;
+    padding: 5px 8px;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+/* === COMBOBOX === */
+QComboBox {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #3a3a3a;
+    border-radius: 4px;
+    padding: 5px 8px;
+}
+QComboBox:hover {
+    border-color: #0078d4;
+}
+QComboBox::drop-down {
+    border: none;
+    width: 20px;
+}
+QComboBox QAbstractItemView {
+    background-color: #252525;
+    color: #e0e0e0;
+    border: 1px solid #3a3a3a;
+    selection-background-color: #0078d4;
+}
+
+/* === SPINBOX === */
+QSpinBox, QDoubleSpinBox {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #3a3a3a;
+    border-radius: 4px;
+    padding: 4px 6px;
+}
+QSpinBox:focus, QDoubleSpinBox:focus {
+    border-color: #0078d4;
+}
+
+/* === CHECKBOX === */
+QCheckBox {
+    color: #e0e0e0;
+    spacing: 8px;
+    background-color: transparent;
+}
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #555555;
+    border-radius: 3px;
+    background-color: #2a2a2a;
+}
+QCheckBox::indicator:checked {
+    background-color: #0078d4;
+    border-color: #0078d4;
+}
+QCheckBox::indicator:hover {
+    border-color: #0078d4;
+}
+
+/* === PROGRESS BAR === */
+QProgressBar {
+    background-color: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    border-radius: 5px;
+    text-align: center;
+    color: #e0e0e0;
+    font-size: 11px;
+}
+QProgressBar::chunk {
+    background-color: #0078d4;
+    border-radius: 4px;
+}
+
+/* === SCROLLBAR === */
+QScrollBar:vertical {
+    background-color: #1e1e1e;
+    width: 10px;
+    border: none;
+}
+QScrollBar::handle:vertical {
+    background-color: #3a3a3a;
+    border-radius: 5px;
+    min-height: 30px;
+}
+QScrollBar::handle:vertical:hover {
+    background-color: #0078d4;
+}
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+QScrollBar:horizontal {
+    background-color: #1e1e1e;
+    height: 10px;
+    border: none;
+}
+QScrollBar::handle:horizontal {
+    background-color: #3a3a3a;
+    border-radius: 5px;
+    min-width: 30px;
+}
+QScrollBar::handle:horizontal:hover {
+    background-color: #0078d4;
+}
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    width: 0px;
+}
+
+/* === SEPARATEURS === */
+QFrame[frameShape=&quot;4&quot;],
+QFrame[frameShape=&quot;5&quot;] {
+    color: #2d2d2d;
+}
+
+/* === GROUP BOX === */
+QGroupBox {
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    margin-top: 12px;
+    padding-top: 8px;
+    color: #aaaaaa;
+    font-size: 11px;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 4px;
+}
+
+/* === TOOLTIP === */
+QToolTip {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+    border: 1px solid #0078d4;
+    border-radius: 3px;
+    padding: 4px 8px;
+}
+</string>
+  </property>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
      <x>870</x>
-     <y>150</y>
-     <width>421</width>
-     <height>261</height>
+     <y>480</y>
+     <width>401</width>
+     <height>271</height>
     </rect>
    </property>
    <property name="title">
@@ -142,13 +307,14 @@
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>401</width>
+      <width>381</width>
       <height>191</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <pointsize>20</pointsize>
+      <family>Segoe UI</family>
+      <pointsize>-1</pointsize>
      </font>
     </property>
    </widget>
@@ -156,7 +322,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>210</y>
+      <y>220</y>
       <width>161</width>
       <height>41</height>
      </rect>
@@ -175,8 +341,8 @@
    <widget class="QToolButton" name="prompt_highlight">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>210</y>
+      <x>240</x>
+      <y>220</y>
       <width>151</width>
       <height>41</height>
      </rect>
@@ -193,240 +359,1599 @@
     </property>
    </widget>
   </widget>
-  <widget class="QWidget" name="verticalLayoutWidget_2">
-   <property name="geometry">
-    <rect>
-     <x>720</x>
-     <y>20</y>
-     <width>121</width>
-     <height>151</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout_2">
-    <item>
-     <widget class="QToolButton" name="timer_play">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>PLAY</string>
-      </property>
-      <property name="icon">
-       <iconset theme="QIcon::ThemeIcon::MediaPlaybackStart"/>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QToolButton" name="timer_pause">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>PAUSE</string>
-      </property>
-      <property name="icon">
-       <iconset theme="QIcon::ThemeIcon::MediaPlaybackPause"/>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QToolButton" name="timer_stop">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>STOP</string>
-      </property>
-      <property name="icon">
-       <iconset theme="QIcon::ThemeIcon::MediaPlaybackStop"/>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QToolButton" name="add_cue">
-   <property name="geometry">
-    <rect>
-     <x>510</x>
-     <y>670</y>
-     <width>111</width>
-     <height>71</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Ajouter un CUE</string>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>icon/32x32_plus.png</normaloff>icon/32x32_plus.png</iconset>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>32</width>
-     <height>32</height>
-    </size>
-   </property>
-   <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
-   </property>
-  </widget>
-  <widget class="QToolButton" name="delete_cue">
-   <property name="geometry">
-    <rect>
-     <x>730</x>
-     <y>670</y>
-     <width>111</width>
-     <height>71</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Supprimer le CUE</string>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>icon/32x32_close.png</normaloff>icon/32x32_close.png</iconset>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>32</width>
-     <height>32</height>
-    </size>
-   </property>
-   <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
-   </property>
-  </widget>
-  <widget class="QToolButton" name="modify_cue">
-   <property name="geometry">
-    <rect>
-     <x>620</x>
-     <y>670</y>
-     <width>111</width>
-     <height>71</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Modifier le CUE</string>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>icon/32x32_configuration.png</normaloff>icon/32x32_configuration.png</iconset>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>32</width>
-     <height>32</height>
-    </size>
-   </property>
-   <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="checkBox">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>680</y>
-     <width>221</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Activer l'envoi des commandes OSC</string>
-   </property>
-  </widget>
   <widget class="Line" name="line">
    <property name="geometry">
     <rect>
      <x>850</x>
-     <y>20</y>
+     <y>130</y>
      <width>20</width>
-     <height>711</height>
+     <height>611</height>
     </rect>
    </property>
    <property name="orientation">
     <enum>Qt::Orientation::Vertical</enum>
    </property>
   </widget>
-  <widget class="QGroupBox" name="groupBox_2">
+  <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>870</x>
-     <y>20</y>
-     <width>421</width>
-     <height>121</height>
+     <x>10</x>
+     <y>680</y>
+     <width>831</width>
+     <height>71</height>
     </rect>
    </property>
    <property name="title">
-    <string>SORTIE VIDEO</string>
+    <string>LOGS</string>
    </property>
-   <widget class="QWidget" name="formLayoutWidget">
+   <widget class="QTextEdit" name="logs_text">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>401</width>
-      <height>61</height>
+      <width>811</width>
+      <height>41</height>
      </rect>
     </property>
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="choixDeLEcranDeSortieLabel">
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>-1</pointsize>
+     </font>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QTabWidget" name="tabWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1141</width>
+     <height>125</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">/* === BARRE D'ONGLETS (style Office Dark) === */
+QTabWidget::pane {
+    background-color: #2b2b2b;
+    border: none;
+    border-top: 2px solid #0078d4;
+}
+
+QTabBar {
+    background-color: #161616;
+}
+
+QTabBar::tab {
+    background-color: transparent;
+    color: #cccccc;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: normal;
+    border: none;
+    min-width: 60px;
+}
+
+QTabBar::tab:selected {
+    background-color: #2b2b2b;
+    color: #ffffff;
+    font-weight: bold;
+    border-top: 3px solid #0078d4;
+}
+
+QTabBar::tab:hover:!selected {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+QPushButton {
+    background-color: transparent;
+    color: #cccccc;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    padding: 4px 8px;
+    font-size: 11px;
+    min-width: 50px;
+    min-height: 40px;
+}
+
+QPushButton:hover {
+    background-color: #2d3a4f;
+    border: 1px solid #0078d4;
+    color: #ffffff;
+}
+
+QPushButton:pressed {
+    background-color: #0078d4;
+    border: 1px solid #005a9e;
+    color: #ffffff;
+}
+
+QPushButton:disabled {
+    color: #555555;
+    background-color: transparent;
+    border: none;
+}
+
+QLabel {
+    color: #cccccc;
+    font-size: 11px;
+    background-color: transparent;
+}
+
+QWidget {
+    background-color: #2b2b2b;
+    color: #cccccc;
+}
+
+QFrame[frameShape=&quot;5&quot;] {
+    color: #3a3a3a;
+    max-width: 1px;
+    margin: 4px 2px;
+}
+</string>
+   </property>
+   <property name="currentIndex">
+    <number>1</number>
+   </property>
+   <widget class="QWidget" name="fichier">
+    <attribute name="title">
+     <string>Fichier</string>
+    </attribute>
+    <widget class="QToolButton" name="save_show">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>10</y>
+       <width>131</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Sauvegarde du show</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icon/32x32_save.png</normaloff>icon/32x32_save.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="quit">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>71</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Quitter </string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icon/32x32_quit.png</normaloff>icon/32x32_quit.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_17">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>0</y>
+       <width>7</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_17">
+     <property name="geometry">
+      <rect>
+       <x>27</x>
+       <y>70</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Quitter</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_18">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>70</y>
+       <width>61</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Sauvegarde</string>
+     </property>
+    </widget>
+    <widget class="Line" name="line_18">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>0</y>
+       <width>7</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="pdf_export">
+     <property name="geometry">
+      <rect>
+       <x>285</x>
+       <y>10</y>
+       <width>81</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Export PDF</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icon/16x16_pdf.png</normaloff>icon/16x16_pdf.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_19">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>70</y>
+       <width>121</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Export du conducteur</string>
+     </property>
+    </widget>
+    <widget class="Line" name="line_19">
+     <property name="geometry">
+      <rect>
+       <x>390</x>
+       <y>0</y>
+       <width>7</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="lock">
+     <property name="geometry">
+      <rect>
+       <x>410</x>
+       <y>10</y>
+       <width>81</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>LOCK</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icon/16x16_unlock.png</normaloff>icon/16x16_unlock.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_20">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>70</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Lock</string>
+     </property>
+    </widget>
+    <widget class="Line" name="line_20">
+     <property name="geometry">
+      <rect>
+       <x>505</x>
+       <y>0</y>
+       <width>7</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>Cues</string>
+    </attribute>
+    <widget class="QToolButton" name="add_cue">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>91</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Ajouter un CUE</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icon/32x32_plus.png</normaloff>icon/32x32_plus.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="modify_cue">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>10</y>
+       <width>91</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Modifier le CUE</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icon/32x32_configuration.png</normaloff>icon/32x32_configuration.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="delete_cue">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>10</y>
+       <width>101</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Supprimer le CUE</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icon/32x32_trash.png</normaloff>icon/32x32_trash.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_3">
+     <property name="geometry">
+      <rect>
+       <x>320</x>
+       <y>0</y>
+       <width>7</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>70</y>
+       <width>51</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Cues actif</string>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="excel_import">
+     <property name="geometry">
+      <rect>
+       <x>330</x>
+       <y>10</y>
+       <width>101</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Import excel</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icon/AppExcel32x32.png</normaloff>icon/AppExcel32x32.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>15</width>
+       <height>15</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="csv_import">
+     <property name="geometry">
+      <rect>
+       <x>330</x>
+       <y>35</y>
+       <width>101</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Import CSV</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icon/csv.png</normaloff>icon/csv.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>15</width>
+       <height>15</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_9">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>0</y>
+       <width>7</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="excel_export">
+     <property name="geometry">
+      <rect>
+       <x>450</x>
+       <y>10</y>
+       <width>101</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Export excel</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icon/AppExcel32x32.png</normaloff>icon/AppExcel32x32.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>15</width>
+       <height>15</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="csv_export">
+     <property name="geometry">
+      <rect>
+       <x>450</x>
+       <y>35</y>
+       <width>101</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Export CSV</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icon/csv.png</normaloff>icon/csv.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>15</width>
+       <height>15</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_10">
+     <property name="geometry">
+      <rect>
+       <x>560</x>
+       <y>0</y>
+       <width>7</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_8">
+     <property name="geometry">
+      <rect>
+       <x>345</x>
+       <y>70</y>
+       <width>71</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>import de cue</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_9">
+     <property name="geometry">
+      <rect>
+       <x>460</x>
+       <y>70</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>export des cues</string>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="delete_all_cues">
+     <property name="geometry">
+      <rect>
+       <x>570</x>
+       <y>10</y>
+       <width>101</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Tout supprimer</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icon/32x32_close.png</normaloff>icon/32x32_close.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_11">
+     <property name="geometry">
+      <rect>
+       <x>680</x>
+       <y>0</y>
+       <width>7</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>590</x>
+       <y>70</y>
+       <width>61</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Supression</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_2">
+    <attribute name="title">
+     <string>Affichage prompteur</string>
+    </attribute>
+    <widget class="QWidget" name="formLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>401</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="choixDeLEcranDeSortieLabel">
+        <property name="text">
+         <string>Choix de l'ecran de sortie</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="screen_selection"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="modeDIncrustationLabel">
+        <property name="text">
+         <string>Mode d'incrustation </string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="key_mode"/>
+      </item>
+     </layout>
+    </widget>
+    <widget class="Line" name="line_5">
+     <property name="geometry">
+      <rect>
+       <x>420</x>
+       <y>0</y>
+       <width>7</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QWidget" name="gridLayoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>10</y>
+       <width>160</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="screen_active">
+        <property name="text">
+         <string>Activer la sortie vidéo</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="fullscreen">
+        <property name="text">
+         <string>Plein ecran</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="Line" name="line_6">
+     <property name="geometry">
+      <rect>
+       <x>610</x>
+       <y>0</y>
+       <width>7</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="prompter_config">
+     <property name="geometry">
+      <rect>
+       <x>620</x>
+       <y>10</y>
+       <width>161</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Config du prompter</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icon/32x32_configuration.png</normaloff>icon/32x32_configuration.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_7">
+     <property name="geometry">
+      <rect>
+       <x>790</x>
+       <y>0</y>
+       <width>7</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QWidget" name="gridLayoutWidget_3">
+     <property name="geometry">
+      <rect>
+       <x>800</x>
+       <y>10</y>
+       <width>160</width>
+       <height>52</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0">
+       <widget class="QToolButton" name="prompt_clear_2">
+        <property name="text">
+         <string>VIDER LE MESSAGE (F1)</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icon/32x32_trash.png</normaloff>icon/32x32_trash.png</iconset>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QToolButton" name="prompt_highlight_2">
+        <property name="text">
+         <string>  FAIRE CLIGNOTER (F2)</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icon/32x32_alert.png</normaloff>icon/32x32_alert.png</iconset>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="Line" name="line_8">
+     <property name="geometry">
+      <rect>
+       <x>970</x>
+       <y>0</y>
+       <width>7</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>850</x>
+       <y>70</y>
+       <width>49</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Message</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>660</x>
+       <y>70</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Configuration</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>500</x>
+       <y>70</y>
+       <width>51</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Affichage</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>70</y>
+       <width>101</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Ecran / incrustation</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_4">
+    <attribute name="title">
+     <string>OSC</string>
+    </attribute>
+    <widget class="QCheckBox" name="osc_active">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>221</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Activer l'envoi des commandes OSC</string>
+     </property>
+    </widget>
+    <widget class="Line" name="line_4">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>0</y>
+       <width>7</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QWidget" name="formLayoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>10</y>
+       <width>221</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="iPDuServeurOSCLabel">
+        <property name="text">
+         <string>IP du serveur OSC</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="osc_server_ip">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="portDuServeurOSCLabel">
+        <property name="text">
+         <string>Port du serveur OSC</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="osc_server_port">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+        </property>
+        <property name="maximum">
+         <number>100000</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QToolButton" name="osc_ping">
+     <property name="geometry">
+      <rect>
+       <x>580</x>
+       <y>10</y>
+       <width>101</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Commande /test</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icon/32x32_antenna.png</normaloff>icon/32x32_antenna.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>25</width>
+       <height>25</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="osc_config">
+     <property name="geometry">
+      <rect>
+       <x>480</x>
+       <y>10</y>
+       <width>81</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Config OSC</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icon/32x32_config.png</normaloff>icon/32x32_config.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>25</width>
+       <height>25</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_13">
+     <property name="geometry">
+      <rect>
+       <x>570</x>
+       <y>0</y>
+       <width>7</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="Line" name="line_14">
+     <property name="geometry">
+      <rect>
+       <x>690</x>
+       <y>0</y>
+       <width>7</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_12">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>70</y>
+       <width>111</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Statut de l'envoi OSC</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_13">
+     <property name="geometry">
+      <rect>
+       <x>340</x>
+       <y>70</y>
+       <width>151</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Configuration serveur cible</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_14">
+     <property name="geometry">
+      <rect>
+       <x>610</x>
+       <y>70</y>
+       <width>51</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Test OSC</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_5">
+    <attribute name="title">
+     <string>Aide</string>
+    </attribute>
+    <widget class="QToolButton" name="open_logs">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>101</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Ouvrir les logs</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icon/32x32_sos.png</normaloff>icon/32x32_sos.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>25</width>
+       <height>25</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QToolButton" name="delete_logs">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>10</y>
+       <width>101</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Vider les logs</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>icon/32x32_trash.png</normaloff>icon/32x32_trash.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>25</width>
+       <height>25</height>
+      </size>
+     </property>
+     <property name="toolButtonStyle">
+      <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_16">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>70</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>logs</string>
+     </property>
+    </widget>
+    <widget class="Line" name="line_16">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>0</y>
+       <width>7</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>870</x>
+     <y>260</y>
+     <width>401</width>
+     <height>201</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Timer global</string>
+   </property>
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>140</y>
+      <width>381</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QToolButton" name="timer_play">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
-        <string>Choix de l'ecran de sortie</string>
+        <string>PLAY</string>
+       </property>
+       <property name="icon">
+        <iconset theme="QIcon::ThemeIcon::MediaPlaybackStart"/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="timer_pause">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>PAUSE</string>
+       </property>
+       <property name="icon">
+        <iconset theme="QIcon::ThemeIcon::MediaPlaybackPause"/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="timer_stop">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>STOP</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>icon/chrono32x32_stop.png</normaloff>icon/chrono32x32_stop.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>381</width>
+      <height>112</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="2">
+        <widget class="QLabel" name="pass_time">
+         <property name="font">
+          <font>
+           <family>Segoe UI</family>
+           <pointsize>-1</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LayoutDirection::RightToLeft</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QLabel {
+    font-size: 16px;
+
+}
+</string>
+         </property>
+         <property name="text">
+          <string>00:00:00</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="label_5">
+         <property name="font">
+          <font>
+           <family>Segoe UI</family>
+           <pointsize>-1</pointsize>
+           <italic>true</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QLabel {
+    font-size: 16px;
+    font-weight: bold;
+}
+</string>
+         </property>
+         <property name="text">
+          <string>Temps écoulé :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="label_7">
+         <property name="font">
+          <font>
+           <family>Segoe UI</family>
+           <pointsize>-1</pointsize>
+           <italic>true</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QLabel {
+    font-size: 16px;
+    font-weight: bold;
+}
+</string>
+         </property>
+         <property name="text">
+          <string>Temps restant :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QLabel" name="remaining_time">
+         <property name="font">
+          <font>
+           <family>Segoe UI</family>
+           <pointsize>-1</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LayoutDirection::RightToLeft</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QLabel {
+    font-size: 16px;
+
+}
+</string>
+         </property>
+         <property name="text">
+          <string>00:00:00</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QProgressBar" name="progressBar">
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="invertedAppearance">
+        <bool>false</bool>
+       </property>
+       <property name="textDirection">
+        <enum>QProgressBar::Direction::BottomToTop</enum>
+       </property>
+       <property name="format">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_4">
+   <property name="geometry">
+    <rect>
+     <x>870</x>
+     <y>130</y>
+     <width>401</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Emission</string>
+   </property>
+   <widget class="QWidget" name="formLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>381</width>
+      <height>96</height>
+     </rect>
+    </property>
+    <layout class="QFormLayout" name="formLayout_3">
+     <item row="0" column="0">
+      <widget class="QLabel" name="titreLabel">
+       <property name="text">
+        <string>Titre</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QComboBox" name="screen_selection"/>
+      <widget class="QLineEdit" name="show_title">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="modeDIncrustationLabel">
+      <widget class="QLabel" name="descriptionLabel">
        <property name="text">
-        <string>Mode d'incrustation </string>
+        <string>Description</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QComboBox" name="key_mode"/>
+      <widget class="QLineEdit" name="show_desc">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="durETotaleLabel">
+       <property name="text">
+        <string>Durée totale</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QTimeEdit" name="show_total_time">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::ButtonSymbols::NoButtons</enum>
+       </property>
+       <property name="displayFormat">
+        <string>mm:ss</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
-   <widget class="QCheckBox" name="screen_active">
+  </widget>
+  <widget class="QGroupBox" name="groupBox_5">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>130</y>
+     <width>831</width>
+     <height>551</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Cues actifs</string>
+   </property>
+   <widget class="QTableWidget" name="cue_table_widget">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>90</y>
-      <width>141</width>
-      <height>20</height>
+      <y>20</y>
+      <width>811</width>
+      <height>501</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Activer la sortie vidéo</string>
-    </property>
    </widget>
-   <widget class="QCheckBox" name="fullscreen">
+   <widget class="QToolButton" name="zoom">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>90</y>
-      <width>141</width>
-      <height>20</height>
+      <x>800</x>
+      <y>523</y>
+      <width>22</width>
+      <height>22</height>
      </rect>
     </property>
     <property name="text">
-     <string>Plein ecran</string>
+     <string>...</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>icon/vpe32x32_zoom_fit_inc.png</normaloff>icon/vpe32x32_zoom_fit_inc.png</iconset>
     </property>
    </widget>
+   <widget class="QToolButton" name="unzoom">
+    <property name="geometry">
+     <rect>
+      <x>780</x>
+      <y>523</y>
+      <width>22</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>...</string>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>icon/vpe32x32_zoom_fit_dec.png</normaloff>icon/vpe32x32_zoom_fit_dec.png</iconset>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="zoom_spin">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>523</y>
+      <width>67</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="buttonSymbols">
+     <enum>QAbstractSpinBox::ButtonSymbols::PlusMinus</enum>
+    </property>
+    <property name="maximum">
+     <number>1000</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_6">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>750</y>
+     <width>1261</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>TIMELINE</string>
+   </property>
+   <widget class="QWidget" name="TIMELINE" native="true">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>1241</width>
+      <height>61</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="pushButton">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>1150</x>
+     <y>30</y>
+     <width>121</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>icon/icon.png</normaloff>
+     <disabledoff>icon/icon.png</disabledoff>icon/icon.png</iconset>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>100</width>
+     <height>100</height>
+    </size>
+   </property>
   </widget>
  </widget>
  <resources/>
