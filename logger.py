@@ -15,12 +15,14 @@ class _CallbackHandler(logging.Handler):
                 pass
 
 
-def _get_logs_dir():
+def _get_userdata_dir():
     if getattr(sys, 'frozen', False):
-        base = os.path.dirname(sys.executable)
-    else:
-        base = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(base, "logs")
+        return os.path.join(os.environ.get("LOCALAPPDATA", os.path.expanduser("~")),
+                            "Foxx Production", "ShowTimer")
+    return os.path.dirname(os.path.abspath(__file__))
+
+def _get_logs_dir():
+    return os.path.join(_get_userdata_dir(), "logs")
 
 
 def setup():

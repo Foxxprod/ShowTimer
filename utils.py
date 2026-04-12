@@ -569,10 +569,12 @@ class AddModifyCueDialog(QDialog):
 
 def _get_stpass_path():
     if getattr(sys, 'frozen', False):
-        base = os.path.dirname(sys.executable)
+        base = os.path.join(os.environ.get("LOCALAPPDATA", os.path.expanduser("~")),
+                            "Foxx Production", "ShowTimer")
+        os.makedirs(base, exist_ok=True)
     else:
         base = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(base, "lock.stpass")
+    return os.path.join(base, "showtimer.stpass")
 
 def init_password_file():
     """À appeler au démarrage — crée showtimer.stpass uniquement s'il n'existe pas."""

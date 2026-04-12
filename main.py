@@ -1205,7 +1205,7 @@ class OperatorDialog(QDialog):
 if __name__ == "__main__":
     import os
     if getattr(sys, 'frozen', False):
-        os.chdir(sys._MEIPASS)  # dossier _internal/ généré par PyInstaller
+        os.chdir(sys._MEIPASS)  # ressources dans _internal/ (icônes, etc.)
 
     logger.setup()
     utils.init_password_file()

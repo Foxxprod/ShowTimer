@@ -2,14 +2,24 @@ import sqlite3, threading, sys, os
 
 db = None
 
-def _base_path():
+def _internal_path():
+    """Dossier _internal/ (ressources embarquées : tables.sql, icons…)."""
     if getattr(sys, 'frozen', False):
-        return sys._MEIPASS  # dossier _internal/ généré par PyInstaller
+        return sys._MEIPASS
+    return os.path.dirname(os.path.abspath(__file__))
+
+def _userdata_path():
+    """Dossier inscriptible pour les données utilisateur (db, stpass…)."""
+    if getattr(sys, 'frozen', False):
+        return os.path.join(os.environ.get("LOCALAPPDATA", os.path.expanduser("~")),
+                            "Foxx Production", "ShowTimer")
     return os.path.dirname(os.path.abspath(__file__))
 
 def connect_db():
     global db
-    db = Database(os.path.join(_base_path(), "database.db"))
+    userdata = _userdata_path()
+    os.makedirs(userdata, exist_ok=True)
+    db = Database(os.path.join(userdata, "database.db"))
     db.connect()
 
 
@@ -30,7 +40,7 @@ class Database:
                 self.connection = sqlite3.connect(self.db_name, check_same_thread=False)
                 #Faire ici requete sql de creation de table si elle n'existe pas deja
                 with self._lock:
-                    with open(os.path.join(_base_path(), "tables.sql"), "r", encoding="utf-8") as f:
+                    with open(os.path.join(_internal_path(), "tables.sql"), "r", encoding="utf-8") as f:
                         self.connection.executescript(f.read())
                 print("Connexion a la base de donnée sqlite effectuee.")
             except sqlite3.Error as e:

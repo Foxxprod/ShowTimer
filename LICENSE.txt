@@ -1,0 +1,97 @@
+================================================================================
+                         CONTRAT DE LICENCE UTILISATEUR FINAL
+                         ShowTimer V1.0 — Foxx Production
+================================================================================
+
+Copyright (c) 2026 Foxx Production. Tous droits réservés.
+
+Ce contrat de licence utilisateur final ("Licence") est un accord légal entre
+vous (personne physique ou morale, ci-après "l'Utilisateur") et Foxx Production
+(ci-après "l'Éditeur") concernant l'utilisation du logiciel ShowTimer V1.0
+(ci-après "le Logiciel").
+
+En installant, copiant ou utilisant le Logiciel, vous acceptez d'être lié par
+les termes de cette Licence. Si vous n'acceptez pas ces termes, n'installez pas
+et n'utilisez pas le Logiciel.
+
+--------------------------------------------------------------------------------
+1. CONCESSION DE LICENCE
+--------------------------------------------------------------------------------
+
+L'Éditeur vous concède une licence non exclusive, non transférable et révocable
+pour utiliser le Logiciel sur vos propres équipements, dans le cadre de vos
+activités professionnelles ou personnelles.
+
+--------------------------------------------------------------------------------
+2. RESTRICTIONS
+--------------------------------------------------------------------------------
+
+Il vous est expressément interdit de :
+
+  a) Reproduire, copier, distribuer ou revendre le Logiciel, en tout ou partie,
+     à titre onéreux ou gratuit, sans l'accord écrit préalable de l'Éditeur ;
+
+  b) Modifier, adapter, traduire, décompiler, désassembler ou tenter d'extraire
+     le code source du Logiciel ;
+
+  c) Louer, prêter, sous-licencier ou céder le Logiciel ou les droits afférents
+     à un tiers ;
+
+  d) Supprimer ou modifier les mentions de copyright, marques ou autres mentions
+     de propriété intellectuelle figurant dans le Logiciel.
+
+--------------------------------------------------------------------------------
+3. PROPRIÉTÉ INTELLECTUELLE
+--------------------------------------------------------------------------------
+
+Le Logiciel, y compris l'ensemble de son code source, de sa documentation, de
+ses interfaces et de ses ressources graphiques, est et demeure la propriété
+exclusive de Foxx Production. Cette Licence ne vous confère aucun droit de
+propriété sur le Logiciel.
+
+--------------------------------------------------------------------------------
+4. MISES À JOUR ET SUPPORT
+--------------------------------------------------------------------------------
+
+L'Éditeur se réserve le droit de modifier, mettre à jour ou cesser le
+développement du Logiciel à tout moment, sans obligation de notification préalable.
+Aucun support technique n'est garanti dans le cadre de cette licence, sauf accord
+contractuel distinct.
+
+--------------------------------------------------------------------------------
+5. LIMITATION DE RESPONSABILITÉ
+--------------------------------------------------------------------------------
+
+LE LOGICIEL EST FOURNI "EN L'ÉTAT", SANS GARANTIE D'AUCUNE SORTE, EXPRESSE OU
+IMPLICITE. EN AUCUN CAS, FOXX PRODUCTION NE POURRA ÊTRE TENU RESPONSABLE DE TOUT
+DOMMAGE DIRECT, INDIRECT, ACCESSOIRE, SPÉCIAL OU CONSÉCUTIF RÉSULTANT DE
+L'UTILISATION OU DE L'IMPOSSIBILITÉ D'UTILISER LE LOGICIEL, MÊME SI L'ÉDITEUR A
+ÉTÉ INFORMÉ DE LA POSSIBILITÉ DE TELS DOMMAGES.
+
+--------------------------------------------------------------------------------
+6. RÉSILIATION
+--------------------------------------------------------------------------------
+
+Cette Licence est effective jusqu'à sa résiliation. Elle sera automatiquement
+résiliée, sans notification, si vous ne respectez pas l'un quelconque de ses
+termes. À la résiliation, vous devez cesser toute utilisation du Logiciel et
+détruire toutes les copies en votre possession.
+
+--------------------------------------------------------------------------------
+7. DROIT APPLICABLE
+--------------------------------------------------------------------------------
+
+Cette Licence est régie par le droit français. Tout litige relatif à son
+interprétation ou à son exécution sera soumis à la compétence exclusive des
+tribunaux compétents du ressort de l'Éditeur.
+
+--------------------------------------------------------------------------------
+8. CONTACT
+--------------------------------------------------------------------------------
+
+Foxx Production
+Contact : contact@foxxprod.fr
+
+================================================================================
+                  © 2026 Foxx Production — Tous droits réservés
+================================================================================
