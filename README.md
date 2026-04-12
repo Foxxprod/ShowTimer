@@ -1,12 +1,16 @@
 # ShowTimer
 
-**ShowTimer** est un logiciel de gestion de minutage et de cues pour les spectacles vivants, conçu par **Foxx Production**. Il permet à l'opérateur de suivre le déroulement d'un show en temps réel, de déclencher des cues automatiquement, d'afficher un prompteur sur un écran secondaire et d'envoyer des commandes OSC vers d'autres équipements.
+**ShowTimer** est un logiciel de gestion de minutage et de cues pour la tv / spectacle. Il permet à l'opérateur de suivre le déroulement d'un show en temps réel, de déclencher des cues automatiquement, d'afficher un prompteur sur un écran secondaire et d'envoyer des commandes OSC vers d'autres équipements.
 
 ---
 
 ## Captures d'écran
 
-> *(Insérer ici les captures d'écran de l'interface opérateur, du prompteur, de la gestion des shows et de la boîte de dialogue des cues.)*
+<img width="525" height="606" alt="image" src="https://github.com/user-attachments/assets/c20a8ee4-dcbd-4db9-9ca4-d57546928df9" />
+<img width="1277" height="894" alt="image" src="https://github.com/user-attachments/assets/99b5874e-35ac-497d-b7a8-15fcf1ecef31" />
+
+
+
 
 ---
 
@@ -20,9 +24,8 @@
 ### Gestion des cues
 - Ajout, modification et suppression de cues
 - Chaque cue possède un titre, une description, un temps de déclenchement, une couleur et une commande OSC optionnelle
-- Validation rapide avec la touche **Entrée** dans le formulaire
-- Import depuis un fichier **CSV** ou **Excel** (.xlsx) avec détection des valeurs manquantes (cellules en rouge)
-- Export en **CSV**, **Excel** et **PDF** — le nom de l'émission est inclus dans le nom du fichier
+- Import depuis un fichier **CSV** ou **Excel** (.xlsx)
+- Export en **CSV**, **Excel** et **PDF** 
 
 ### Minutage en temps réel
 - Timer principal avec démarrage, pause et reset
@@ -37,12 +40,10 @@
 - Affiche le titre du cue en cours, le suivant et le second suivant
 - Horloge temps réel intégrée
 - Personnalisation complète : taille et couleur de chaque zone, largeur des contours, seuils et couleurs des alertes de clignotement
-- La géométrie de la fenêtre est préservée lors des modifications de configuration
 
 ### OSC
 - Envoi de commandes OSC à l'adresse IP et au port configurés
 - Activation / désactivation de l'OSC depuis l'interface
-- Arguments OSC pris en charge par cue
 
 ### Sécurité
 - Verrouillage de l'interface opérateur par mot de passe
@@ -83,45 +84,6 @@ python main.py
 
 ---
 
-## Compilation (développeurs)
-
-Le projet utilise **PyInstaller** (via auto-py-to-exe) pour générer l'exécutable.
-
-**Paramètres recommandés :**
-
-| Paramètre | Valeur |
-|---|---|
-| Mode | One Directory |
-| Fichier principal | `main.py` |
-| Icône | `icon/icon.ico` |
-| Fichiers additionnels | `tables.sql`, `ui/`, `icon/` → dossier `_internal/` |
-| Nom de l'exécutable | `ShowTimer_1.0` |
-
-Après compilation, utiliser le script **Inno Setup** situé dans `installer/ShowTimer_setup.iss` pour générer l'installateur.
-
----
-
-## Structure du projet
-
-```
-ShowTimer/
-├── main.py               # Point d'entrée, interface opérateur (QMainWindow)
-├── utils.py              # Dialogues, export PDF/CSV/Excel, import, verrouillage
-├── database.py           # Gestion SQLite (shows, cues, config)
-├── logger.py             # Système de logs (fichier + UI callback)
-├── prompter.py           # Fenêtre prompteur (écran secondaire)
-├── tables.sql            # Schéma et valeurs par défaut de la base de données
-├── ui/
-│   └── operator.ui       # Interface Qt Designer de l'opérateur
-├── icon/
-│   └── icon.ico          # Icône de l'application
-├── installer/
-│   └── ShowTimer_setup.iss  # Script Inno Setup
-├── LICENSE.txt
-└── README.md
-```
-
----
 
 ## Utilisation
 
@@ -136,11 +98,11 @@ Au premier lancement, la base de données et le fichier `.stpass` sont créés a
 ### Ajouter des cues
 1. Avec le show actif sélectionné, aller dans l'onglet **Cues**
 2. Cliquer sur **Ajouter un cue**
-3. Renseigner le titre, la description, le temps de déclenchement, la couleur et optionnellement une commande OSC
+3. Renseigner le titre, la description, le temps de déclenchement et optionnellement une commande OSC
 4. Valider avec **Entrée** ou le bouton **Enregistrer**
 
 ### Importer des cues
-- Cliquer sur **Importer CSV** ou **Importer Excel**
+- Cliquer sur **Importer CSV** ou **Importer Excel** / Creer des cues manuellement.
 - Les cellules avec des valeurs manquantes ou un temps à zéro sont surlignées en rouge dans l'aperçu
 - Confirmer pour importer
 
@@ -166,7 +128,7 @@ Au premier lancement, la base de données et le fichier `.stpass` sont créés a
 | Élément | Minimum |
 |---|---|
 | OS | Windows 10 64-bit |
-| RAM | 256 Mo |
+| RAM | 2 Go |
 | Résolution | 1280 × 720 |
 | Espace disque | 100 Mo |
 
@@ -178,4 +140,4 @@ Ce logiciel est la propriété exclusive de **Foxx Production**. Toute reproduct
 
 ---
 
-© 2024 Foxx Production — [foxxprod.fr](https://www.foxxprod.fr/)
+© 2026 Foxx Production — [foxxprod.fr](https://www.foxxprod.fr/)
