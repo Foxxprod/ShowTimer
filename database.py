@@ -1,10 +1,15 @@
-import sqlite3, threading
+import sqlite3, threading, sys, os
 
 db = None
 
+def _base_path():
+    if getattr(sys, 'frozen', False):
+        return sys._MEIPASS  # dossier _internal/ généré par PyInstaller
+    return os.path.dirname(os.path.abspath(__file__))
+
 def connect_db():
     global db
-    db = Database("database.db")
+    db = Database(os.path.join(_base_path(), "database.db"))
     db.connect()
 
 
@@ -25,7 +30,7 @@ class Database:
                 self.connection = sqlite3.connect(self.db_name, check_same_thread=False)
                 #Faire ici requete sql de creation de table si elle n'existe pas deja
                 with self._lock:
-                    with open("tables.sql", "r", encoding="utf-8") as f:
+                    with open(os.path.join(_base_path(), "tables.sql"), "r", encoding="utf-8") as f:
                         self.connection.executescript(f.read())
                 print("Connexion a la base de donnée sqlite effectuee.")
             except sqlite3.Error as e:

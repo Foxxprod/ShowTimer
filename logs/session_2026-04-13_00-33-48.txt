@@ -1,0 +1,3 @@
+00:33:48  [INFO]  === Session démarrée ===
+00:33:50  [INFO]  Émission ouverte (id=1)
+00:34:02  [INFO]  Fichier de mot de passe créé : c:\Users\Perso-PC\Documents\GitHub\TIMER_PCP\showtimer.stpass

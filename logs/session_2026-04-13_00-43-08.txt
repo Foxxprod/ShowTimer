@@ -1,0 +1,4 @@
+00:43:08  [INFO]  === Session démarrée ===
+00:43:08  [INFO]  Fichier de mot de passe créé : c:\Users\Perso-PC\Documents\GitHub\TIMER_PCP\lock.stpass
+00:43:10  [INFO]  Émission ouverte (id=1)
+00:43:23  [INFO]  Cue ajouté : 'sdqfqsdfsq' à 600000ms  |  OSC:  0

@@ -1,0 +1,2 @@
+00:36:45  [INFO]  === Session démarrée ===
+00:36:49  [INFO]  Émission ouverte (id=1)

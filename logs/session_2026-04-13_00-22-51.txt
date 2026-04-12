@@ -1,0 +1,4 @@
+00:22:51  [INFO]  === Session démarrée ===
+00:23:10  [INFO]  Timer démarré.
+00:23:25  [INFO]  Timer arrêté.
+00:26:37  [INFO]  Timer démarré.

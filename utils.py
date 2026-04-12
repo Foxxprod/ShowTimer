@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QStandardItemModel, QStandardItem, QColor, QPainter, QPainterPath, QFont, QPen, QPixmap
 from PySide6.QtCore import QTime, Qt, Signal
 
-import database, osc
+import database, osc, logger, sys, os
 
 
 from ui.ui_new_show import Ui_Dialog
@@ -396,6 +396,7 @@ class CreateShowDialog(QDialog):
             return
         
         database.db.AddShow(name, desc, ms)
+        logger.info(f"Émission ajoutée : '{name}' (durée {ms}ms)")
         self.accept()
 
 class ModifyShowDialog(QDialog):
@@ -441,6 +442,7 @@ class ModifyShowDialog(QDialog):
             return
         
         database.db.ModifyShow(self.show_id, name, desc, ms)
+        logger.info(f"Émission modifiée (id={self.show_id}) : '{name}' (durée {ms}ms)")
         self.accept()
 
 
@@ -499,6 +501,10 @@ class AddModifyCueDialog(QDialog):
         self.ui.abort.clicked.connect(self.reject)
         self.ui.validate.clicked.connect(self.save_cue)
 
+        from PySide6.QtGui import QShortcut, QKeySequence
+        QShortcut(QKeySequence(Qt.Key.Key_Return), self).activated.connect(self.save_cue)
+        QShortcut(QKeySequence(Qt.Key.Key_Enter),  self).activated.connect(self.save_cue)
+
         if self.action == 'modifier' and cue_id is not None:
             try:
                 cue = database.db.GetCueById(cue_id)
@@ -534,16 +540,17 @@ class AddModifyCueDialog(QDialog):
         osc_command = self.ui.osc_command.text()
         osc_args = self.ui.osc_args.value()
 
-        if not name or ms == 0 or not osc_command:
-            QMessageBox.warning(self, "Config invalide", "Le nom, le temps et la commande OSC doivent être saisies.")
+        if not name or ms == 0 :
+            QMessageBox.warning(self, "Config invalide", "Le nom et le temps doivent être saisies.")
             return
 
         if self.action == 'ajouter':
             try:
                 database.db.AddCueToShow(database.db.GetActiveShow(), name, desc, ms, osc_command, osc_args, "#161A16")
+                logger.info(f"Cue ajouté : '{name}' à {ms}ms  |  OSC: {osc_command} {osc_args}")
                 self.accept()
             except Exception as e:
-                print(f"Erreur lors de l'ajout du cue: {e}")
+                logger.error(f"Erreur ajout cue '{name}' : {e}")
                 QMessageBox.critical(self, "Erreur", "Impossible d'ajouter le cue à la base de données.")
                 self.reject()
                 return
@@ -551,16 +558,36 @@ class AddModifyCueDialog(QDialog):
         elif self.action == 'modifier':
             try:
                 database.db.ModifyCue(self.cue_id, name, desc, ms, osc_command, osc_args, "#161A16")
+                logger.info(f"Cue modifié (id={self.cue_id}) : '{name}' à {ms}ms  |  OSC: {osc_command} {osc_args}")
                 self.accept()
             except Exception as e:
-                print(f"Erreur lors de la modification du cue: {e}")
+                logger.error(f"Erreur modification cue id={self.cue_id} : {e}")
                 QMessageBox.critical(self, "Erreur", "Impossible de modifier le cue dans la base de données.")
                 self.reject()
                 return
 
 
+def _get_stpass_path():
+    if getattr(sys, 'frozen', False):
+        base = os.path.dirname(sys.executable)
+    else:
+        base = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base, "lock.stpass")
+
+def init_password_file():
+    """À appeler au démarrage — crée showtimer.stpass uniquement s'il n'existe pas."""
+    path = _get_stpass_path()
+    if not os.path.exists(path):
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("admin")
+        logger.info(f"Fichier de mot de passe créé : {path}")
+
+def _read_password():
+    with open(_get_stpass_path(), "r", encoding="utf-8") as f:
+        return f.read().strip()
+
+
 class LockDialog(QDialog):
-    MOT_DE_PASSE = "secretav"
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -636,7 +663,7 @@ class LockDialog(QDialog):
         self.password_input.setFocus()
 
     def _check(self):
-        if self.password_input.text() == self.MOT_DE_PASSE:
+        if self.password_input.text() == _read_password():
             self.accept()
         else:
             self.lbl_error.setText("Mot de passe incorrect.")
@@ -733,9 +760,10 @@ def parse_file_to_cues(filepath):
 
 
 class ImportExcelDialog(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, mode="excel"):
         super().__init__(parent)
-        self.setWindowTitle("Importer des cues depuis Excel")
+        label = "CSV" if mode == "csv" else "Excel"
+        self.setWindowTitle(f"Importer des cues depuis {label}")
         self.setMinimumSize(900, 500)
         self.cues = []
 
@@ -744,7 +772,7 @@ class ImportExcelDialog(QDialog):
         # Sélection du fichier
         top = QHBoxLayout()
         self.path_input = QLineEdit()
-        self.path_input.setPlaceholderText("Chemin vers le fichier Excel...")
+        self.path_input.setPlaceholderText(f"Chemin vers le fichier {label}...")
         self.path_input.setReadOnly(True)
         top.addWidget(self.path_input)
         btn_browse = QPushButton("Parcourir...")
@@ -790,6 +818,7 @@ class ImportExcelDialog(QDialog):
 
     def _fill_table(self):
         self.table.setRowCount(0)
+        RED = QColor("#FF4444")
         for cue in self.cues:
             row = self.table.rowCount()
             self.table.insertRow(row)
@@ -797,11 +826,18 @@ class ImportExcelDialog(QDialog):
             h = ms // 3600000
             m = (ms % 3600000) // 60000
             s = (ms % 60000) // 1000
-            self.table.setItem(row, 0, QTableWidgetItem(cue["nom"]))
-            self.table.setItem(row, 1, QTableWidgetItem(cue["description"]))
-            self.table.setItem(row, 2, QTableWidgetItem(f"{h:02d}:{m:02d}:{s:02d}"))
-            self.table.setItem(row, 3, QTableWidgetItem(cue["osc_url"]))
-            self.table.setItem(row, 4, QTableWidgetItem(cue["osc_args"]))
+            values = [
+                cue["nom"],
+                cue["description"],
+                f"{h:02d}:{m:02d}:{s:02d}",
+                cue["osc_url"],
+                cue["osc_args"],
+            ]
+            for col, val in enumerate(values):
+                item = QTableWidgetItem(val)
+                if not val.strip() or (col == 2 and ms == 0):
+                    item.setBackground(RED)
+                self.table.setItem(row, col, item)
 
     def _import(self):
         """Relit le tableau (modifiable) et met à jour self.cues avant d'accepter."""
@@ -916,11 +952,10 @@ def export_show_to_pdf(show_id, output_path):
   }}
   .show-block h2 {{ margin: 0 0 4px 0; font-size: 14pt; color: #2c3e50; }}
   .show-block p  {{ margin: 2px 0; font-size: 9pt; color: #444; }}
-  table {{ width: 100%; border-collapse: collapse; font-size: 6.5pt; table-layout: auto; }}
+  table {{ width: 100%; border-collapse: collapse; font-size: 6.5pt; table-layout: fixed; }}
   thead tr {{ background: #2c3e50; color: white; }}
-  thead th {{ padding: 3px 4px; text-align: left; font-weight: bold; white-space: nowrap; }}
-  thead th.desc {{ white-space: normal; width: 100%; }}
-  tbody td {{ padding: 2px 4px; border-bottom: 1px solid #ddd; vertical-align: top; white-space: nowrap; }}
+  thead th {{ padding: 3px 4px; text-align: left; font-weight: bold; overflow: hidden; }}
+  tbody td {{ padding: 2px 4px; border-bottom: 1px solid #ddd; vertical-align: top; overflow: hidden; word-wrap: break-word; }}
   tbody td.desc {{ white-space: normal; }}
   .footer {{
       margin-top: 24px; border-top: 1px solid #ccc; padding-top: 6px;
@@ -952,13 +987,13 @@ def export_show_to_pdf(show_id, output_path):
 <table>
   <thead>
     <tr>
-      <th>N&deg;</th>
-      <th>Nom</th>
-      <th class="desc">Description</th>
-      <th>D&eacute;clenchement</th>
-      <th>&Delta; Pr&eacute;c&eacute;dent</th>
-      <th>Commande OSC</th>
-      <th>Argument OSC</th>
+      <th width="3%">N&deg;</th>
+      <th width="13%">Nom</th>
+      <th width="24%" class="desc">Description</th>
+      <th width="10%">D&eacute;clenchement</th>
+      <th width="10%">&Delta; Pr&eacute;c&eacute;dent</th>
+      <th width="27%">Commande OSC</th>
+      <th width="13%">Arg. OSC</th>
     </tr>
   </thead>
   <tbody>

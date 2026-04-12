@@ -16,16 +16,16 @@
 # - Pour chaques timer, on affiche au dessus un label avec un message du genre "Retour plateau dans..." OKK
 # - Possibilitée d'affciher en meme temps plusieurs timers OKK -- RETIREE ENFAIT DANS LA DERNIERE VERSION
 # - Pouvoir faire clignoter le texte du prompteur quand un nouveau message a été saisie OKK
-# - Rendre plus visible le timers quand le temps arrive au bout (changement de couleur, clignotement...)
-# - Avoir contour sur les texte du prompteur -- VOIR COMMENT FAIRE CAR PAS POSSIBLE SUR QT
-# - Pouvoir importer depuis excel un conducteur 
-# - pas pouvoir modifier tableau d'ajout des shows
+# - Rendre plus visible le timers quand le temps arrive au bout (changement de couleur, clignotement...) OKK
+# - Avoir contour sur les texte du prompteur -- VOIR COMMENT FAIRE CAR PAS POSSIBLE SUR QT OKK
+# - Pouvoir importer depuis excel un conducteur OKK
+# - pas pouvoir modifier tableau d'ajout des shows OKK
 
 
 
 #--------------------------------------------------------------------------------------------------------------------
-import database, utils, osc
-import sys, threading
+import database, utils, osc, logger
+import sys, threading, os, openpyxl
 from timeline import TimelineWidget
 from ui.ui_main import Ui_MainWindow
 from ui.ui_operator import Ui_Dialog as Ui_OperatorDialog
@@ -152,7 +152,7 @@ class MainWindow(QMainWindow):
     )
 
         if reply == QMessageBox.Yes:
-            print("Suppression confirmée.")
+            logger.info(f"Émission supprimée (id={self.selected_show_id})")
             database.db.DeleteShow(self.selected_show_id)
             self.update_shows_table() #apres la suppression, on met a jour le tableau pour que la suppression soit visible
         else:
@@ -188,9 +188,23 @@ class MainWindow(QMainWindow):
             return
         
         database.db.SetActiveShow(self.selected_show_id)
+        logger.info(f"Émission ouverte (id={self.selected_show_id})")
         self.operator_dialog = OperatorDialog()  
         self.hide()
         self.operator_dialog.show()
+
+    def closeEvent(self, event):
+        reply = QMessageBox.question(
+            self,
+            "Quitter",
+            "Voulez-vous vraiment quitter ShowTimer ?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        if reply == QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
 
     def change_osc_config(self): #interface de changement de la config OSC
         dialog = utils.ModifyOSCConfigDialog()
@@ -239,6 +253,12 @@ class OperatorDialog(QDialog):
         self.load_data_in_ui() #affiche le nom, la desc et le temp du show dans l'ui
 
         
+
+        ########LOGS########
+        self.ui.open_logs.clicked.connect(self._open_logs)
+        self.ui.delete_logs.clicked.connect(self._delete_logs)
+        self._refresh_logs_text()
+        logger.set_ui_callback(self._append_log)
 
         ########BARRE DE FONCTIONS - MENU FICHIER########
         self.ui.quit.clicked.connect(self.close)
@@ -329,7 +349,7 @@ class OperatorDialog(QDialog):
 
 
         except Exception as e:
-            print(e)
+            logger.error(f"Impossible de charger les données du show dans l'interface : {e}")
             QMessageBox.critical(self, "Erreur", "Impossible de charger les données de l'emmsion dans l'interface.")
 
     ###################PARAMETRE DU PROMPTEUR########################################
@@ -425,6 +445,7 @@ class OperatorDialog(QDialog):
             QMessageBox.information(self, "Test OSC", "Message /test avec l'argument int 1 envoyé au serveur OSC")
 
         except Exception as e:
+            logger.error(f"Erreur test OSC : {e}")
             QMessageBox.critical(self, "Test OSC", f"Une erreur s'est produite lors du test OSC : {str(e)}")
 
 
@@ -463,6 +484,7 @@ class OperatorDialog(QDialog):
             osc.osc_client.send(osc_url, osc_args)
             QMessageBox.information(self, "OSC envoyé", f"Commande envoyée :\n{osc_url}  {osc_args}")
         except Exception as e:
+            logger.error(f"Erreur envoi OSC : {e}")
             QMessageBox.critical(self, "Erreur OSC", f"Impossible d'envoyer la commande OSC :\n{e}")
 
     #####################################################################################
@@ -497,7 +519,7 @@ class OperatorDialog(QDialog):
         )
 
         if reply == QMessageBox.Yes:
-            print("Suppression confirmée.")
+            logger.info(f"Cue supprimé (id={self.selected_cue_id})")
             database.db.DeleteCue(self.selected_cue_id)
             cues = database.db.GetAllCuesFromShow(database.db.GetActiveShow()) or []
             self.timer.set_cues(cues)
@@ -516,12 +538,13 @@ class OperatorDialog(QDialog):
             )
 
             if reply == QMessageBox.Yes:
-                print("Suppression confirmée.")
+                logger.info("Tous les cues du show actif supprimés.")
                 database.db.DeleteAllCuesFromShow(database.db.GetActiveShow())
                 self.fill_table()  # rafraîchit le tableau apres la suppression de tous les cues
             else:
                 print("Suppression annulée.")
         except Exception as e:
+            logger.error(f"Erreur suppression de tous les cues : {e}")
             QMessageBox.critical(self, "Erreur", f"Une erreur s'est produite lors de la suppression de tous les cues : {str(e)}")
 
     
@@ -692,10 +715,12 @@ class OperatorDialog(QDialog):
 
         if self.timer.timeline_time > 0:
             self.timer.resume()
+            logger.info("Timer repris.")
         else:
-            self.last_next_cues = []  # ← reset pour forcer le re-coloriage
-            self.fill_table()         # ← reremplit le tableau
+            self.last_next_cues = []
+            self.fill_table()
             self.timer.start(0)
+            logger.info("Timer démarré.")
 
         self.update_buttons_state("running")
 
@@ -715,6 +740,7 @@ class OperatorDialog(QDialog):
         if reponse == QMessageBox.Yes:
             self.timer.pause()
             self.update_buttons_state("paused")
+            logger.info("Timer mis en pause.")
 
     def on_stop_clicked(self):
         reponse = QMessageBox.question(
@@ -729,6 +755,7 @@ class OperatorDialog(QDialog):
             return
 
         self.timer.stop()
+        logger.info("Timer arrêté.")
         self.update_buttons_state("stopped")
         self.derniere_seconde_affichee = -1
         self.ui.pass_time.setText("00:00:00")
@@ -835,7 +862,7 @@ class OperatorDialog(QDialog):
                 self.ui.cue_table_widget.scrollToItem(item_nom)
                 break
 
-        print(f"[CUE] {cue['nom']} déclenché à {cue['temps']}ms")
+        logger.info(f"CUE déclenché : '{cue['nom']}' à {cue['temps']}ms  |  OSC: {cue.get('osc_url','')} {cue.get('osc_args','')}")
 
     def on_next_cue(self, cues):
         from PySide6.QtGui import QColor
@@ -947,8 +974,7 @@ class OperatorDialog(QDialog):
             )
 
     def import_from_file(self, mode):
-        dialog = utils.ImportExcelDialog(self)
-        # Pré-filtrer selon le bouton utilisé
+        dialog = utils.ImportExcelDialog(self, mode=mode)
         if mode == "excel":
             dialog._browse_filter = "Excel (*.xlsx *.xls)"
         else:
@@ -968,6 +994,7 @@ class OperatorDialog(QDialog):
             cues = database.db.GetAllCuesFromShow(show_id) or []
             self.timer.set_cues(cues)
             self.fill_table()
+            logger.info(f"{len(dialog.cues)} cue(s) importés depuis fichier ({mode.upper()}).")
             QMessageBox.information(self, "Import réussi", f"{len(dialog.cues)} cue(s) importé(s).")
 
     def export_cues(self, mode):
@@ -984,8 +1011,11 @@ class OperatorDialog(QDialog):
             QMessageBox.warning(self, "Aucun cue", "Aucun cue à exporter.")
             return
 
-        # Génération du suffixe date_heure
+        # Génération du suffixe date_heure et nom du show
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        show = database.db.GetShowById(show_id)
+        show_name = show.get("nom", "show") if show else "show"
+        show_name = "".join(c for c in show_name if c.isalnum() or c in " _-").strip().replace(" ", "_")
         
         def ms_to_mmss(ms):
             m = ms // 60000
@@ -1003,7 +1033,7 @@ class OperatorDialog(QDialog):
             ])
 
         if mode == "excel":
-            default_name = f"cues_export_{timestamp}.xlsx"
+            default_name = f"{show_name}_cues_{timestamp}.xlsx"
             path, _ = QFileDialog.getSaveFileName(self, "Exporter en Excel", default_name, "Excel (*.xlsx)")
             
             if not path:
@@ -1029,7 +1059,7 @@ class OperatorDialog(QDialog):
             wb.save(path)
 
         elif mode == "csv":
-            default_name = f"cues_export_{timestamp}.csv"
+            default_name = f"{show_name}_cues_{timestamp}.csv"
             path, _ = QFileDialog.getSaveFileName(self, "Exporter en CSV", default_name, "CSV (*.csv)")
             
             if not path:
@@ -1052,7 +1082,10 @@ class OperatorDialog(QDialog):
             return
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        default_name = f"rapport_show_{timestamp}.pdf"
+        show = database.db.GetShowById(show_id)
+        show_name = show.get("nom", "show") if show else "show"
+        show_name = "".join(c for c in show_name if c.isalnum() or c in " _-").strip().replace(" ", "_")
+        default_name = f"{show_name}_rapport_{timestamp}.pdf"
         path, _ = QFileDialog.getSaveFileName(self, "Exporter en PDF", default_name, "PDF (*.pdf)")
         if not path:
             return
@@ -1061,7 +1094,68 @@ class OperatorDialog(QDialog):
             export_show_to_pdf(show_id, path)
             QMessageBox.information(self, "Export réussi", f"PDF exporté vers :\n{path}")
         except Exception as e:
+            logger.error(f"Erreur export PDF : {e}")
             QMessageBox.critical(self, "Erreur export PDF", str(e))
+
+    # ── Logs ──────────────────────────────────────────────────
+    def _append_log(self, line):
+        """Appelé par logger à chaque nouvelle entrée — mise à jour en temps réel."""
+        self.ui.logs_text.append(line)
+        self.ui.logs_text.verticalScrollBar().setValue(
+            self.ui.logs_text.verticalScrollBar().maximum()
+        )
+
+    def closeEvent(self, event):
+        logger.clear_ui_callback()
+        event.accept()
+
+    def _refresh_logs_text(self):
+        """Affiche les dernières lignes du log courant dans logs_text."""
+        path = logger.get_log_file_path()
+        if path and os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                content = f.read()
+            self.ui.logs_text.setPlainText(content)
+            self.ui.logs_text.verticalScrollBar().setValue(
+                self.ui.logs_text.verticalScrollBar().maximum()
+            )
+        else:
+            self.ui.logs_text.setPlainText("Aucun log disponible.")
+
+    def _open_logs(self):
+        """Ouvre le dossier des logs dans l'explorateur."""
+        logs_dir = logger.get_logs_dir()
+        os.makedirs(logs_dir, exist_ok=True)
+        os.startfile(logs_dir)
+
+    def _delete_logs(self):
+        """Supprime tous les fichiers de logs après confirmation."""
+        logs_dir = logger.get_logs_dir()
+        if not os.path.exists(logs_dir):
+            QMessageBox.information(self, "Logs", "Aucun fichier de log à supprimer.")
+            return
+
+        fichiers = [f for f in os.listdir(logs_dir) if f.endswith(".txt")]
+        if not fichiers:
+            QMessageBox.information(self, "Logs", "Aucun fichier de log à supprimer.")
+            return
+
+        reply = QMessageBox.question(
+            self,
+            "Supprimer les logs",
+            f"Voulez-vous vraiment supprimer {len(fichiers)} fichier(s) de log ?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        if reply == QMessageBox.Yes:
+            for f in fichiers:
+                try:
+                    os.remove(os.path.join(logs_dir, f))
+                except Exception:
+                    pass
+            logger.info("Fichiers de logs supprimés par l'utilisateur.")
+            self._refresh_logs_text()
+            QMessageBox.information(self, "Logs", "Fichiers de logs supprimés.")
 
     def lock_interface(self):
         from PySide6.QtWidgets import QWidget
@@ -1109,8 +1203,21 @@ class OperatorDialog(QDialog):
     
 
 if __name__ == "__main__":
-    database.connect_db() #Connexion a la base de donnée sqlite
-    osc.connect_osc_client() #Connexion au client OSC, pour pouvoir envoyer des messages OSC a chataigne
+    import os
+    if getattr(sys, 'frozen', False):
+        os.chdir(sys._MEIPASS)  # dossier _internal/ généré par PyInstaller
+
+    logger.setup()
+    utils.init_password_file()
+
+    def _handle_exception(exc_type, exc_value, exc_tb):
+        import traceback
+        logger.error("Exception non gérée : " + "".join(traceback.format_exception(exc_type, exc_value, exc_tb)))
+        sys.__excepthook__(exc_type, exc_value, exc_tb)
+    sys.excepthook = _handle_exception
+
+    database.connect_db()
+    osc.connect_osc_client()
 
     #database.db.AddCueToShow(1, "Test Cue 2", "Description du cue 2", 130000, "/test/cue2", "arg1 arg2", "#189E35") #ajout de cue de test dans la base de donnée, pour pouvoir tester l'interface de controle et le timer
 

@@ -1020,7 +1020,7 @@ QFrame[frameShape=&quot;5&quot;] {
       </rect>
      </property>
      <property name="text">
-      <string>Supression</string>
+      <string>Suppression</string>
      </property>
     </widget>
    </widget>
@@ -1034,7 +1034,7 @@ QFrame[frameShape=&quot;5&quot;] {
        <x>10</x>
        <y>10</y>
        <width>401</width>
-       <height>51</height>
+       <height>68</height>
       </rect>
      </property>
      <layout class="QFormLayout" name="formLayout">
@@ -1293,7 +1293,7 @@ QFrame[frameShape=&quot;5&quot;] {
        <x>250</x>
        <y>10</y>
        <width>221</width>
-       <height>51</height>
+       <height>68</height>
       </rect>
      </property>
      <layout class="QFormLayout" name="formLayout_2">
