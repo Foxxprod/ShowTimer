@@ -38,9 +38,11 @@ Source: "C:\Users\Perso-PC\Documents\GitHub\TIMER_PCP\output\ShowTimer\{#MyAppEx
 Source: "C:\Users\Perso-PC\Documents\GitHub\TIMER_PCP\output\ShowTimer\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
+; Raccourcis menu Démarrer (optionnels)
 Name: "{autoprograms}\{#MyAppName}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: startmenuicon
-Name: "{autoprograms}\{#MyAppName}\Désinstaller {#MyAppName}"; Filename: "{uninstallexe}"; Tasks: startmenuicon
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+; Raccourci désinstalleur — toujours créé dans le menu Démarrer
+Name: "{autoprograms}\{#MyAppName}\Désinstaller {#MyAppName}"; Filename: "{uninstallexe}"
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

@@ -1227,6 +1227,33 @@ if __name__ == "__main__":
 
 
 
+    # --- Adaptation automatique à l'écran ---
+    # Taille de la plus grande fenêtre (operator.ui : 1279×862) + marge taskbar
+    DESIGN_W, DESIGN_H = 1279, 920
+    try:
+        import ctypes
+        user32   = ctypes.windll.user32
+        shcore   = ctypes.windll.shcore
+        # Pixels physiques bruts (valables quel que soit le niveau de DPI awareness du process)
+        physical_w = user32.GetSystemMetrics(0)
+        physical_h = user32.GetSystemMetrics(1)
+        # DPI système → facteur d'échelle Windows (96 = 100 %, 144 = 150 %, …)
+        try:
+            system_dpi = shcore.GetDpiForSystem()  # disponible depuis Windows 8.1
+        except Exception:
+            system_dpi = 96
+        dpi_scale = system_dpi / 96.0
+        # Taille logique que Qt6 utilisera (après sa propre compensation DPI)
+        screen_w = int(physical_w / dpi_scale)
+        screen_h = int(physical_h / dpi_scale)
+    except Exception:
+        screen_w, screen_h = 1920, 1080  # fallback si ctypes indisponible
+
+    scale = min(screen_w / DESIGN_W, screen_h / DESIGN_H)
+    if scale < 1.0:
+        os.environ["QT_SCALE_FACTOR"] = f"{scale:.3f}"
+    # ----------------------------------------
+
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon("icon/icon.png"))
     window = MainWindow()
