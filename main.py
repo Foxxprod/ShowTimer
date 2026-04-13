@@ -65,11 +65,86 @@ class MainWindow(QMainWindow):
         self.ui.add_show.clicked.connect(self.create_show)
         self.ui.modify_show.clicked.connect(self.modify_show)
         self.ui.open_show.clicked.connect(self.open_show)
+        self.ui.import_show.clicked.connect(self._import_stshow)
+
+        ######BARRE DE MENUS - IMPORT######
+        self.ui.show_import.triggered.connect(self._import_stshow)
 
         ######TABLEAU######
         self.ui.show_table_view.doubleClicked.connect(self.open_show)
         self.ui.show_table_view.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.show_table_view.customContextMenuRequested.connect(self.show_table_context_menu)
+
+    def _import_stshow(self, path=None):
+        import xml.etree.ElementTree as ET
+        from PySide6.QtWidgets import QFileDialog, QMessageBox
+
+        if not path:
+            documents_dir = os.path.join(os.path.expanduser("~"), "Documents")
+            path, _ = QFileDialog.getOpenFileName(
+                self, "Importer un show", documents_dir,
+                "ShowTimer Show (*.stshow)"
+            )
+        if not path:
+            return
+
+        try:
+            tree = ET.parse(path)
+            root = tree.getroot()
+
+            info = root.find("info")
+            if info is None:
+                raise ValueError("Fichier .stshow invalide : balise <info> manquante.")
+
+            nom         = info.findtext("nom", default="")
+            description = info.findtext("description", default="")
+            duree       = info.findtext("duree", default="0")
+
+            # Demande de confirmation si le show existe déjà
+            shows = database.db.GetAllShows() or []
+            existing = next((s for s in shows if s.get("nom") == nom), None)
+            if existing:
+                rep = QMessageBox.question(
+                    self, "Show existant",
+                    f"Un show nommé « {nom} » existe déjà.\nVoulez-vous quand même l'importer comme nouveau show ?",
+                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No
+                )
+                if rep != QMessageBox.Yes:
+                    return
+
+            # Création du show
+            database.db.AddShow(nom, description, int(duree))
+            shows_updated = database.db.GetAllShows() or []
+            # On récupère le show qui vient d'être créé (dernier inséré avec ce nom)
+            new_show = next((s for s in reversed(shows_updated) if s.get("nom") == nom), None)
+            if new_show is None:
+                raise ValueError("Impossible de retrouver le show après insertion.")
+            new_show_id = new_show["id"]
+
+            # Import des cues
+            cues_el = root.find("cues")
+            cues = cues_el.findall("cue") if cues_el is not None else []
+            for cue in cues:
+                database.db.AddCueToShow(
+                    new_show_id,
+                    cue.findtext("nom", default=""),
+                    cue.findtext("description", default=""),
+                    int(cue.findtext("temps", default="0")),
+                    cue.findtext("osc_url", default=""),
+                    cue.findtext("osc_args", default=""),
+                    cue.findtext("color", default="#FFFFFF"),
+                )
+
+            logger.info(f"Show importé depuis {path} — {len(cues)} cue(s)")
+            self.update_shows_table()
+            QMessageBox.information(
+                self, "Import réussi",
+                f"Show « {nom} » importé avec {len(cues)} cue(s)."
+            )
+
+        except Exception as e:
+            logger.error(f"Erreur import .stshow : {e}")
+            QMessageBox.critical(self, "Erreur d'import", f"Impossible de lire le fichier :\n{e}")
 
     def show_table_context_menu(self, pos):
         from PySide6.QtWidgets import QMenu
@@ -268,6 +343,7 @@ class OperatorDialog(QDialog):
         self.ui.excel_export.clicked.connect(lambda: self.export_cues("excel"))
         self.ui.csv_export.clicked.connect(lambda: self.export_cues("csv"))
         self.ui.pdf_export.clicked.connect(self._export_pdf)
+        self.ui.save_show.clicked.connect(self._save_show_stshow)
 
 
         ############BARRE DE FONCTIONS - MENU OSC########
@@ -1097,6 +1173,76 @@ class OperatorDialog(QDialog):
             logger.error(f"Erreur export PDF : {e}")
             QMessageBox.critical(self, "Erreur export PDF", str(e))
 
+    def _save_show_stshow(self):
+        import xml.etree.ElementTree as ET
+        from xml.dom import minidom
+        from PySide6.QtWidgets import QFileDialog, QMessageBox
+        from datetime import datetime
+
+        show_id = database.db.GetActiveShow()
+        if show_id is None:
+            QMessageBox.warning(self, "Aucun show", "Aucun show actif.")
+            return
+
+        show = database.db.GetShowById(show_id)
+        if show is None:
+            QMessageBox.warning(self, "Erreur", "Impossible de récupérer le show.")
+            return
+
+        cues = database.db.GetAllCuesFromShow(show_id) or []
+
+        # Nom de fichier par défaut
+        show_name = "".join(c for c in show.get("nom", "show") if c.isalnum() or c in " _-").strip().replace(" ", "_")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        default_name = f"{show_name}_{timestamp}.stshow"
+
+        # Dossier Documents de l'utilisateur
+        documents_dir = os.path.join(os.path.expanduser("~"), "Documents")
+
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Sauvegarder le show", os.path.join(documents_dir, default_name),
+            "ShowTimer Show (*.stshow)"
+        )
+        if not path:
+            return
+
+        # Construction du XML
+        root = ET.Element("show")
+        root.set("version", "1.0")
+
+        info = ET.SubElement(root, "info")
+        ET.SubElement(info, "id").text          = str(show.get("id", ""))
+        ET.SubElement(info, "nom").text         = str(show.get("nom", ""))
+        ET.SubElement(info, "description").text = str(show.get("description", ""))
+        ET.SubElement(info, "duree").text       = str(show.get("duree", ""))
+        ET.SubElement(info, "exported_at").text = datetime.now().isoformat()
+
+        cues_el = ET.SubElement(root, "cues")
+        for cue in cues:
+            c = ET.SubElement(cues_el, "cue")
+            ET.SubElement(c, "cue_id").text    = str(cue.get("cue_id", ""))
+            ET.SubElement(c, "nom").text       = str(cue.get("nom", ""))
+            ET.SubElement(c, "description").text = str(cue.get("description", ""))
+            ET.SubElement(c, "temps").text     = str(cue.get("temps", ""))
+            ET.SubElement(c, "osc_url").text   = str(cue.get("osc_url", ""))
+            ET.SubElement(c, "osc_args").text  = str(cue.get("osc_args", ""))
+            ET.SubElement(c, "color").text     = str(cue.get("color", ""))
+
+        # Formatage avec indentation
+        xml_str = minidom.parseString(ET.tostring(root, encoding="unicode")).toprettyxml(indent="  ")
+        # toprettyxml ajoute une déclaration XML, on garde uniquement le contenu
+        xml_str = "\n".join(xml_str.split("\n")[1:])
+
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                f.write('<?xml version="1.0" encoding="utf-8"?>\n')
+                f.write(xml_str)
+            logger.info(f"Show sauvegardé : {path}")
+            QMessageBox.information(self, "Sauvegarde réussie", f"Show sauvegardé vers :\n{path}")
+        except Exception as e:
+            logger.error(f"Erreur sauvegarde .stshow : {e}")
+            QMessageBox.critical(self, "Erreur", f"Impossible d'écrire le fichier :\n{e}")
+
     # ── Logs ──────────────────────────────────────────────────
     def _append_log(self, line):
         """Appelé par logger à chaque nouvelle entrée — mise à jour en temps réel."""
@@ -1258,4 +1404,14 @@ if __name__ == "__main__":
     app.setWindowIcon(QIcon("icon/icon.png"))
     window = MainWindow()
     window.show()
+
+    # Si lancé via double-clic sur un .stshow, on l'importe automatiquement
+    stshow_path = None
+    for arg in sys.argv[1:]:
+        if arg.lower().endswith(".stshow") and os.path.isfile(arg):
+            stshow_path = arg
+            break
+    if stshow_path:
+        QTimer.singleShot(300, lambda: window._import_stshow(stshow_path))
+
     sys.exit(app.exec_())

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'mainHrioZq.ui'
+## Form generated from reading UI file 'mainbCTUhC.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.9.0
 ##
@@ -315,6 +315,8 @@ class Ui_MainWindow(object):
         self.actionContact_33_6_52_75_25_29.setObjectName(u"actionContact_33_6_52_75_25_29")
         self.actiontitouan_gallin_gmail_com = QAction(MainWindow)
         self.actiontitouan_gallin_gmail_com.setObjectName(u"actiontitouan_gallin_gmail_com")
+        self.show_import = QAction(MainWindow)
+        self.show_import.setObjectName(u"show_import")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.label = QLabel(self.centralwidget)
@@ -384,13 +386,25 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.add_show)
 
+        self.import_show = QToolButton(self.horizontalLayoutWidget)
+        self.import_show.setObjectName(u"import_show")
+        sizePolicy.setHeightForWidth(self.import_show.sizePolicy().hasHeightForWidth())
+        self.import_show.setSizePolicy(sizePolicy)
+        icon3 = QIcon()
+        icon3.addFile(u"icon/32x32_import.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.import_show.setIcon(icon3)
+        self.import_show.setIconSize(QSize(32, 32))
+        self.import_show.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
+
+        self.horizontalLayout.addWidget(self.import_show)
+
         self.modify_show = QToolButton(self.horizontalLayoutWidget)
         self.modify_show.setObjectName(u"modify_show")
         sizePolicy.setHeightForWidth(self.modify_show.sizePolicy().hasHeightForWidth())
         self.modify_show.setSizePolicy(sizePolicy)
-        icon3 = QIcon()
-        icon3.addFile(u"icon/32x32_configuration.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.modify_show.setIcon(icon3)
+        icon4 = QIcon()
+        icon4.addFile(u"icon/32x32_configuration.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.modify_show.setIcon(icon4)
         self.modify_show.setIconSize(QSize(32, 32))
         self.modify_show.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
 
@@ -400,9 +414,9 @@ class Ui_MainWindow(object):
         self.delete_show.setObjectName(u"delete_show")
         sizePolicy.setHeightForWidth(self.delete_show.sizePolicy().hasHeightForWidth())
         self.delete_show.setSizePolicy(sizePolicy)
-        icon4 = QIcon()
-        icon4.addFile(u"icon/32x32_close.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.delete_show.setIcon(icon4)
+        icon5 = QIcon()
+        icon5.addFile(u"icon/32x32_close.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.delete_show.setIcon(icon5)
         self.delete_show.setIconSize(QSize(32, 32))
         self.delete_show.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextUnderIcon)
 
@@ -421,14 +435,18 @@ class Ui_MainWindow(object):
         self.menuConfig.setObjectName(u"menuConfig")
         self.menuAide = QMenu(self.menubar)
         self.menuAide.setObjectName(u"menuAide")
+        self.menuImport = QMenu(self.menubar)
+        self.menuImport.setObjectName(u"menuImport")
         MainWindow.setMenuBar(self.menubar)
 
         self.menubar.addAction(self.menuConfig.menuAction())
+        self.menubar.addAction(self.menuImport.menuAction())
         self.menubar.addAction(self.menuAide.menuAction())
         self.menuConfig.addAction(self.actionConfig_OSC)
         self.menuConfig.addAction(self.actionConfig_prompter)
         self.menuAide.addAction(self.actionContact_33_6_52_75_25_29)
         self.menuAide.addAction(self.actiontitouan_gallin_gmail_com)
+        self.menuImport.addAction(self.show_import)
 
         self.retranslateUi(MainWindow)
 
@@ -441,15 +459,18 @@ class Ui_MainWindow(object):
         self.actionConfig_prompter.setText(QCoreApplication.translate("MainWindow", u"Config du prompteur", None))
         self.actionContact_33_6_52_75_25_29.setText(QCoreApplication.translate("MainWindow", u"Contact : +33 6 52 75 25 29", None))
         self.actiontitouan_gallin_gmail_com.setText(QCoreApplication.translate("MainWindow", u"titouan.gallin@gmail.com", None))
+        self.show_import.setText(QCoreApplication.translate("MainWindow", u"Importer un show", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"SHOW TIMER V1", None))
         self.pushButton.setText("")
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"\u00a9 FoxxProd 2026 - ShowTimer 1.0", None))
         self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"Selectionnez une emission a ouvrir / modifier / supprimer", None))
         self.open_show.setText(QCoreApplication.translate("MainWindow", u"OUVRIR", None))
         self.add_show.setText(QCoreApplication.translate("MainWindow", u"CREER NOUVEAU", None))
+        self.import_show.setText(QCoreApplication.translate("MainWindow", u"IMPORTER", None))
         self.modify_show.setText(QCoreApplication.translate("MainWindow", u"MODIFIER", None))
         self.delete_show.setText(QCoreApplication.translate("MainWindow", u"SUPPRIMER", None))
         self.menuConfig.setTitle(QCoreApplication.translate("MainWindow", u"Config", None))
         self.menuAide.setTitle(QCoreApplication.translate("MainWindow", u"Aide", None))
+        self.menuImport.setTitle(QCoreApplication.translate("MainWindow", u"Import", None))
     # retranslateUi
 

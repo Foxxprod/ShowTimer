@@ -452,6 +452,32 @@ QToolTip {
        </widget>
       </item>
       <item>
+       <widget class="QToolButton" name="import_show">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>IMPORTER</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icon/32x32_import.png</normaloff>icon/32x32_import.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QToolButton" name="modify_show">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -543,7 +569,14 @@ QToolTip {
     <addaction name="actionContact_33_6_52_75_25_29"/>
     <addaction name="actiontitouan_gallin_gmail_com"/>
    </widget>
+   <widget class="QMenu" name="menuImport">
+    <property name="title">
+     <string>Import</string>
+    </property>
+    <addaction name="show_import"/>
+   </widget>
    <addaction name="menuConfig"/>
+   <addaction name="menuImport"/>
    <addaction name="menuAide"/>
   </widget>
   <action name="actionConfig_OSC">
@@ -564,6 +597,11 @@ QToolTip {
   <action name="actiontitouan_gallin_gmail_com">
    <property name="text">
     <string>titouan.gallin@gmail.com</string>
+   </property>
+  </action>
+  <action name="show_import">
+   <property name="text">
+    <string>Importer un show</string>
    </property>
   </action>
  </widget>

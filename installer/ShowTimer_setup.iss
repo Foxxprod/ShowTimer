@@ -44,5 +44,12 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 ; Raccourci désinstalleur — toujours créé dans le menu Démarrer
 Name: "{autoprograms}\{#MyAppName}\Désinstaller {#MyAppName}"; Filename: "{uninstallexe}"
 
+[Registry]
+; Association de l'extension .stshow
+Root: HKA; Subkey: "Software\Classes\.stshow";                                          ValueType: string; ValueName: ""; ValueData: "FoxxProduction.ShowFile";               Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\FoxxProduction.ShowFile";                          ValueType: string; ValueName: ""; ValueData: "ShowTimer Show File";                   Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Classes\FoxxProduction.ShowFile\DefaultIcon";              ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"
+Root: HKA; Subkey: "Software\Classes\FoxxProduction.ShowFile\shell\open\command";       ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
+
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
