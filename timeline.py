@@ -2,6 +2,11 @@ from PySide6.QtWidgets import QWidget, QToolTip
 from PySide6.QtCore import Qt, QRect, QPoint
 from PySide6.QtGui import QPainter, QColor, QPen, QFont, QFontMetrics
 
+#Classe de la timeline en bas de l'interface de l'operateur
+#!!!! Ce code a été fait avec l'IA, peut etre verifier en detail
+#okk
+
+
 
 class TimelineWidget(QWidget):
     def __init__(self, duree_totale_ms, parent=None):

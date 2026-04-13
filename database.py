@@ -219,7 +219,8 @@ class Database:
     
     #####################################CONFIGURATION PROMPTEUR#########################################
 
-    def GetPrompterConfig(self):
+    def GetPrompterConfig(self): #renvoie la config du prompteur 
+        #si la config n'existe pas, on renvoi une config par defaut
         defaults = {
             "prompter_text_size":       "60",
             "prompter_text_color":      "#B8860B",
@@ -255,7 +256,8 @@ class Database:
                 print(f"Erreur lors de la recuperation de la config prompteur: {e}")
                 return defaults
 
-    def SetPrompterConfig(self, **kwargs):
+
+    def SetPrompterConfig(self, **kwargs): #met a jour la config du prompteur, insere si inexistant MAIS normalement mnt c'est dans la base de donnee 
         with self._lock:
             try:
                 cursor = self.connection.cursor()

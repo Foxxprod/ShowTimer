@@ -1,65 +1,16 @@
 from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtCore import Slot, Qt
-from PySide6.QtGui import QPainter, QPainterPath, QFont, QColor, QPen
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QMenu
 from ui.ui_prompter import Ui_Dialog as Ui_PrompterDialog
 from PySide6.QtCore import Signal
 from PySide6.QtCore import QTimer
 import database
+from utils import LabelWithOutline
 
-
-class LabelWithOutline(QWidget):
-    def __init__(self, text="", color=None, font_size=36, outline_width=4, parent=None):
-        super().__init__(parent)
-        self._text = text
-        self._color = color or QColor("white")
-        self._font_size = font_size
-        self._outline_width = outline_width
-
-    def set_text(self, text):
-        self._text = text
-        self.update()
-
-    def set_color(self, color):
-        self._color = QColor(color) if isinstance(color, str) else color
-        self.update()
-
-    def set_font_size(self, size):
-        self._font_size = int(size)
-        self.update()
-
-    def set_outline_width(self, width):
-        self._outline_width = int(width)
-        self.update()
-
-    def paintEvent(self, event):
-        if not self._text:
-            return
-
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
-
-        font = QFont("Arial", self._font_size, QFont.Bold)
-        path = QPainterPath()
-        path.addText(0, 0, font, self._text)
-
-        text_rect = path.boundingRect()
-        if text_rect.width() == 0 or text_rect.height() == 0:
-            return
-
-        scale_x = self.width() / text_rect.width() if text_rect.width() > self.width() else 1.0
-        scale_y = self.height() / text_rect.height() if text_rect.height() > self.height() else 1.0
-        scale = min(scale_x, scale_y)
-
-        painter.translate(self.width() / 2, self.height() / 2)
-        painter.scale(scale, scale)
-        painter.translate(-text_rect.center())
-
-        painter.setPen(QPen(QColor("black"), self._outline_width / scale))
-        painter.setBrush(self._color)
-        painter.drawPath(path)
-
-
+#classe de la fenetre du prompteur
+#v modif avec  plus de label classique pour avoir des contours
+#Par contre pas reussi a appliquer la meme chose pour le texte de message...
 class PrompterWindow(QWidget):
     closed_window = Signal()
     fullscreen_changed = Signal(bool)
@@ -72,14 +23,14 @@ class PrompterWindow(QWidget):
 
         self.ui.prompt_text.setAlignment(Qt.AlignCenter)
 
-        self.setWindowFlags(Qt.Window | Qt.CustomizeWindowHint | Qt.WindowTitleHint | Qt.WindowMinimizeButtonHint)
+        self.setWindowFlags(Qt.Window | Qt.CustomizeWindowHint | Qt.WindowTitleHint | Qt.WindowMinimizeButtonHint) #permet de ne pas avoir les bouton en haut de la fenetre pour ne pas avoir de bouton de fermeture
 
-        self.timer = timer
-        self.duree_totale_ms = duree_totale_ms
+        self.timer = timer #instance du timer de l'emission, passé a la creation de la fenetre
+        self.duree_totale_ms = duree_totale_ms #duree totale du show, present dans la bdd
 
-        self._setup_custom_labels()
-        self._connecter_signaux()
-        self._reset_affichage()
+        self._setup_custom_labels() #remplace les widget vide par les custom avec lignes de contour
+        self._connecter_signaux() #connecte les signauc pour recevoir les infos du timer
+        self._reset_affichage() #remet a zero l'affichage
 
         for widget in self.findChildren(QWidget):
             widget.setContextMenuPolicy(Qt.NoContextMenu)
@@ -104,7 +55,7 @@ class PrompterWindow(QWidget):
         self.cue_blink_mode = None   # None | "first" | "second" | "third"
         self.cue_blink_color = QColor("white")
 
-        # Valeurs de config chargées depuis la BDD à chaque ouverture
+        # Valeurs de config chargées depuis la BDD à chaque ouverture, ca c'est des val par defaut 
         self.cfg_blink_first_time  = 20000
         self.cfg_blink_second_time = 10000
         self.cfg_blink_third_time  = 5000
@@ -119,7 +70,7 @@ class PrompterWindow(QWidget):
         self._apply_config()
         super().showEvent(event)
 
-    def _apply_config(self):
+    def _apply_config(self): #appluqe la config depuis la bdd
         c = database.db.GetPrompterConfig()
 
         self._cfg_text_size = c['prompter_text_size']
@@ -188,8 +139,7 @@ class PrompterWindow(QWidget):
 
     ######################CONFIG DU PROMPTEUR################################
 
-    def set_screen(self, screen_index):
-        """Change l'écran sur lequel la fenêtre est affichée."""
+    def set_screen(self, screen_index): #permet de choisir sur quel ecran on affiche a partir de l'index de l'ecran 
         ecrans = QApplication.screens()
 
         if screen_index < len(ecrans):
@@ -200,17 +150,21 @@ class PrompterWindow(QWidget):
 
         self.setGeometry(ecran_cible.geometry())
 
-    def set_fullscreen(self, fullscreen):
+    def set_fullscreen(self, fullscreen): #permet de mettre la fenetre en plein ecran, bien sans les bordures 
         if fullscreen:
             self.showFullScreen()
         else:
             self.showNormal()
         self.fullscreen_changed.emit(fullscreen)
 
-    def set_background_color(self, couleur):
+    def set_background_color(self, couleur): #changer la couleure de fond entre vert ou noir
+        #soit on veut faire du chroma ou du luma
+        #Faire en sorte de pouvoir chganger la couleure de fond du chroma plus tard, si on veut par ex du bleu a la place du vert
+        #Car actuellement j'ai peur que en clignotant vert, le texte soit incrusté
         self.setStyleSheet(f"background-color: {couleur};")
 
-    def contextMenuEvent(self, event):
+    def contextMenuEvent(self, event): #petit menu clic droit pour fermer ou passer en plein ecran 
+        #avant ca c'etait pas simple de fermer si on metait en plein ecran par erreur sur le meme ecran que l'ope ui
         menu = QMenu(self)
         menu.setStyleSheet("""
             QMenu {
@@ -237,25 +191,27 @@ class PrompterWindow(QWidget):
         self.closed_window.emit()
         super().hideEvent(event)
 
-    def _connecter_signaux(self):
+    def _connecter_signaux(self): #connecter les signaux du timer
         self.timer.updated_time.connect(self.on_updated_time)
         self.timer.two_next_cues.connect(self.on_two_next_cues)
 
-    def _reset_affichage(self):
+    def _reset_affichage(self): #remet a zero l'affichage
         self.next_cue_label.set_text("")
         self.second_cue_label.set_text("")
         self.clock_label.set_text("")
 
-    def set_prompt_text(self, texte):
+    def set_prompt_text(self, texte): #changer le texte de message du prompt
         self.ui.prompt_text.setPlainText(texte)
         self.ui.prompt_text.setAlignment(Qt.AlignCenter)
 
-    @Slot(int)
+    @Slot(int) #met a jour le temps ecoulé et restant 
     def on_updated_time(self, temps_ms):
+        #c'est le ecoulé qui est passé en paramètre 
         h_e = temps_ms // 3600000
         m_e = (temps_ms % 3600000) // 60000
         s_e = (temps_ms % 60000) // 1000
 
+        #faut recalculer le restant a partir du temps total
         restant = max(0, self.duree_totale_ms - temps_ms)
         h_r = restant // 3600000
         m_r = (restant % 3600000) // 60000
@@ -265,6 +221,9 @@ class PrompterWindow(QWidget):
             f"Écoulé : {h_e:02d}:{m_e:02d}:{s_e:02d}     Restant : {h_r:02d}:{m_r:02d}:{s_r:02d}"
         )
 
+    #afficher les deux cues suivants
+    #Au final on a enlevé un des deux label, ca faisait trop d'infos a l'ecran
+    #si besoin de remettre suffit de decommenter
     @Slot(list)
     def on_two_next_cues(self, cues):
         if len(cues) >= 1:
@@ -290,7 +249,7 @@ class PrompterWindow(QWidget):
             self.second_cue_label.set_text("")
         """
 
-    def _update_cue_blink(self, temps_dans_ms):
+    def _update_cue_blink(self, temps_dans_ms): #fais le clignotement des cues
         """Détermine le mode de clignotement selon le temps restant avant le cue."""
         if temps_dans_ms is None or temps_dans_ms > self.cfg_blink_first_time:
             new_mode = None
@@ -306,7 +265,7 @@ class PrompterWindow(QWidget):
             interval = 800
 
         if new_mode == self.cue_blink_mode:
-            return  # rien à changer
+            return
 
         self.cue_blink_mode = new_mode
         self.cue_blink_state = False
@@ -332,8 +291,7 @@ class PrompterWindow(QWidget):
             self.next_cue_label.set_color(self.cfg_next_cue_base_color)
 
     ######################GESTION DU CLIGNOTEMENT###########################
-    def start_blink(self):
-        """Démarre le clignotement pendant 5 secondes."""
+    def start_blink(self): #permet de faire clignoter le message pendant 5s
         self.blink_state = False
         self.blink_timer.start()
         self.blink_stop_timer.start(5000)
@@ -352,6 +310,7 @@ class PrompterWindow(QWidget):
                 }}
             """)
         else:
+            #reprend bien les valeure de la base dans l'etat normal
             self.ui.prompt_text.setStyleSheet(f"""
                 QTextEdit {{
                     font-size: {self._cfg_text_size}px;
@@ -363,7 +322,7 @@ class PrompterWindow(QWidget):
                 }}
             """)
 
-    def _stop_blink(self):
+    def _stop_blink(self): #quand on arrete on reprend les valeure de la base
         self.blink_timer.stop()
         self.blink_state = False
         self.ui.prompt_text.setStyleSheet(f"""

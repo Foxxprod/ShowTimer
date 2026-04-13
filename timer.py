@@ -2,6 +2,10 @@ import time
 from PySide6.QtCore import QObject, QTimer, Signal
 import osc, database
 
+#classe qui gere tout le timer global 
+#et l'envoie des osc au bon moment
+#envoie a l'interface avec des signaux QT le temps actuel pour l'affichage
+#Les decomptes... sont géré par les interface QT
 
 class PrompteurTimer(QObject):
 
@@ -88,10 +92,10 @@ class PrompteurTimer(QObject):
         for cue in self.cues_list:
             if self.last_verified_time < cue["temps"] <= time_now:
                 self.fired_cue.emit(cue)
-                osc_state = database.db.GetOSCState()
-                if osc_state == "True":
-                    if cue["osc_url"] != "" and cue["osc_args"] != "":
-                        osc.osc_client.send(cue["osc_url"], cue["osc_args"])
+                osc_state = database.db.GetOSCState() # on recupere depuis la base de donnée l'etat de l'osc, c'est la case a cocher dans l'ui
+                if osc_state == "True": #si osc actif
+                    if cue["osc_url"] != "" and cue["osc_args"] != "": #verfie que l'osc est complet, avant j'avait pas ca et si pas d'argument ca fais une boucle infinue d'erreur, pas foufou 
+                        osc.osc_client.send(cue["osc_url"], cue["osc_args"]) #envoie de la commande OSC
                     else:
                         print(f"OSC non configuré pour ce cue: {cue['nom']} à {cue['temps']} ms")
                     print(f"Cue déclenché: {cue['nom']} à {cue['temps']} ms")
@@ -104,7 +108,7 @@ class PrompteurTimer(QObject):
         #les deux prochain cue a venir
         self.two_next_cues.emit(self.find_next_cues(time_now))
 
-    def find_next_cues(self, actual_time_ms, number=2):
+    def find_next_cues(self, actual_time_ms, number=2): #renvoie les prochains cue a venir
         resultat = []
         for cue in self.cues_list:
             if cue["temps"] > actual_time_ms:

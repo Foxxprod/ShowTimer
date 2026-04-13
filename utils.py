@@ -14,6 +14,9 @@ from ui.ui_new_show import Ui_Dialog
 from ui.ui_osc_config import Ui_Dialog as Ui_OSCDialog
 from ui.ui_add_modify_cue import Ui_Dialog as Ui_CueDialog
 
+#classe qui contient les label utilisé pour les timer avec la bordure
+#On remplace le widget generique par ce widget custom
+#C'est pas du texte c'est une image vectorisé
 class LabelWithOutline(QWidget):
     def __init__(self, text="", color=None, font_size=36, outline_width=4, parent=None):
         super().__init__(parent)
@@ -567,6 +570,9 @@ class AddModifyCueDialog(QDialog):
                 return
 
 
+#renvoie l'enplacement du fichier mot de passe de l'interface 
+#s'adapte si on est compilé ou non avec frozen 
+#Sans ca j'avais un bug de windows qui m'enpechait d'ecrire dans C:/program files
 def _get_stpass_path():
     if getattr(sys, 'frozen', False):
         base = os.path.join(os.environ.get("LOCALAPPDATA", os.path.expanduser("~")),
@@ -576,18 +582,27 @@ def _get_stpass_path():
         base = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(base, "showtimer.stpass")
 
+#creer le fichier de mot de passe au premier demarage ou si inexistant
+#pour l'instant par defaut c'est admin
+#Voir pour ajouter une interface de changement du MDP ???????
 def init_password_file():
-    """À appeler au démarrage — crée showtimer.stpass uniquement s'il n'existe pas."""
     path = _get_stpass_path()
     if not os.path.exists(path):
         with open(path, "w", encoding="utf-8") as f:
-            f.write("admin")
+            f.write("admin") #MDP DEFAUT = admin
         logger.info(f"Fichier de mot de passe créé : {path}")
 
+#Lit le mot de passe dans le fichier 
+#renvoie le mot de passe
+#Il se base sur le chemin renvoyé par _get_stpass_path
 def _read_password():
     with open(_get_stpass_path(), "r", encoding="utf-8") as f:
         return f.read().strip()
 
+
+#Interface de verouillage 
+
+#########GENEREE PAR IA############ !!!!!!!!!!!!
 
 class LockDialog(QDialog):
 
@@ -676,6 +691,8 @@ class LockDialog(QDialog):
 
 
 ####################FONCTION D'IMPORT DE DONNEES DEPUIS EXCEL/CSV####################
+#Toutes ces fonction d'import de donnée et d'export sont génées par IA !!!!!!!!!!
+#A reverifer en detail
 
 def _temps_to_ms(val):
     if val is None:
@@ -874,10 +891,6 @@ class ImportExcelDialog(QDialog):
         self.accept()
 
 
-# ─────────────────────────────────────────────────────────────
-# Export PDF du show actif
-# ─────────────────────────────────────────────────────────────
-
 def _ms_to_hms(ms):
     ms = max(0, int(ms))
     h  = ms // 3600000
@@ -1021,4 +1034,4 @@ def export_show_to_pdf(show_id, output_path):
     doc.setHtml(html)
     doc.setPageSize(QSizeF(printer.pageRect(QPrinter.Unit.Point).size()))
     doc.print_(printer)
-
+#########FIN GENERE PAR IA############ !!!!!!!!!!!!
