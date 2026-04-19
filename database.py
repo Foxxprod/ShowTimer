@@ -310,7 +310,7 @@ class Database:
             except sqlite3.Error as e:
                 print(f"Erreur lors de la mise a jour de la configuration OSC dans la base de donnée: {e}")
 
-
+    
     def GetOSCState(self):
         with self._lock:
             try:
@@ -325,3 +325,38 @@ class Database:
             except sqlite3.Error as e:
                 print(f"Erreur lors de la recuperation de la configuration OSC dans la base de donnée: {e}")
                 return None
+            
+
+    #ajout d'une variable de retour a zero, permet de revenir a zero dans la commande OSC 
+    #sinon dans chataigne la condition est toujours = et les action ne peuvent pas etre redeclenché un deuxième fois
+    def SetOSCreturntozero(self, state):
+        with self._lock:
+            if state == True:
+                state = "True"
+            else:
+                state = "False"
+
+            try:
+                cursor = self.connection.cursor()
+                cursor.execute("INSERT OR REPLACE INTO config (parameter, value) VALUES ('OSC_RTZ', ?)", (state,))
+                self.connection.commit()
+            except sqlite3.Error as e:
+                print(f"Erreur lors de la mise a jour de la configuration OSC dans la base de donnée: {e}")
+
+    def GetOSCreturntozero(self):
+        with self._lock:
+            try:
+                cursor = self.connection.cursor()
+                cursor.execute("SELECT value FROM config WHERE parameter = 'OSC_RTZ'") #recup la valeur de l'etat OSC
+                result = cursor.fetchone()
+                if result:
+                    if result[0] == "True":
+                        return True
+                    else:
+                        return False
+                else:
+                    print("Aucune configuration OSC trouvee dans la base de donnée.")
+                    return False #si pas de config gezocht on retourne false
+            except sqlite3.Error as e:
+                print(f"Erreur lors de la recuperation de la configuration OSC dans la base de donnée: {e}")
+                return False

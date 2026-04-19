@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'operatorXCUzjp.ui'
+## Form generated from reading UI file 'operatorQdbOwl.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.9.0
 ##
@@ -591,7 +591,7 @@ class Ui_Dialog(object):
         self.tab_2.setObjectName(u"tab_2")
         self.formLayoutWidget = QWidget(self.tab_2)
         self.formLayoutWidget.setObjectName(u"formLayoutWidget")
-        self.formLayoutWidget.setGeometry(QRect(10, 10, 401, 51))
+        self.formLayoutWidget.setGeometry(QRect(10, 10, 401, 68))
         self.formLayout = QFormLayout(self.formLayoutWidget)
         self.formLayout.setObjectName(u"formLayout")
         self.formLayout.setContentsMargins(0, 0, 0, 0)
@@ -702,7 +702,7 @@ class Ui_Dialog(object):
         self.line_4.setFrameShadow(QFrame.Shadow.Sunken)
         self.formLayoutWidget_2 = QWidget(self.tab_4)
         self.formLayoutWidget_2.setObjectName(u"formLayoutWidget_2")
-        self.formLayoutWidget_2.setGeometry(QRect(250, 10, 221, 51))
+        self.formLayoutWidget_2.setGeometry(QRect(250, 10, 221, 68))
         self.formLayout_2 = QFormLayout(self.formLayoutWidget_2)
         self.formLayout_2.setObjectName(u"formLayout_2")
         self.formLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -767,6 +767,9 @@ class Ui_Dialog(object):
         self.label_14 = QLabel(self.tab_4)
         self.label_14.setObjectName(u"label_14")
         self.label_14.setGeometry(QRect(610, 70, 51, 16))
+        self.osc_rtz = QCheckBox(self.tab_4)
+        self.osc_rtz.setObjectName(u"osc_rtz")
+        self.osc_rtz.setGeometry(QRect(10, 40, 221, 20))
         self.tabWidget.addTab(self.tab_4, "")
         self.tab_5 = QWidget()
         self.tab_5.setObjectName(u"tab_5")
@@ -994,7 +997,7 @@ class Ui_Dialog(object):
 
         self.retranslateUi(Dialog)
 
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(3)
 
 
         QMetaObject.connectSlotsByName(Dialog)
@@ -1026,7 +1029,7 @@ class Ui_Dialog(object):
         self.label_8.setText(QCoreApplication.translate("Dialog", u"import de cue", None))
         self.label_9.setText(QCoreApplication.translate("Dialog", u"export des cues", None))
         self.delete_all_cues.setText(QCoreApplication.translate("Dialog", u"Tout supprimer", None))
-        self.label_10.setText(QCoreApplication.translate("Dialog", u"Supression", None))
+        self.label_10.setText(QCoreApplication.translate("Dialog", u"Suppression", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("Dialog", u"Cues", None))
         self.choixDeLEcranDeSortieLabel.setText(QCoreApplication.translate("Dialog", u"Choix de l'ecran de sortie", None))
         self.modeDIncrustationLabel.setText(QCoreApplication.translate("Dialog", u"Mode d'incrustation ", None))
@@ -1048,6 +1051,7 @@ class Ui_Dialog(object):
         self.label_12.setText(QCoreApplication.translate("Dialog", u"Statut de l'envoi OSC", None))
         self.label_13.setText(QCoreApplication.translate("Dialog", u"Configuration serveur cible", None))
         self.label_14.setText(QCoreApplication.translate("Dialog", u"Test OSC", None))
+        self.osc_rtz.setText(QCoreApplication.translate("Dialog", u"Retour a zero de l'arg OSC", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), QCoreApplication.translate("Dialog", u"OSC", None))
         self.open_logs.setText(QCoreApplication.translate("Dialog", u"Ouvrir les logs", None))
         self.delete_logs.setText(QCoreApplication.translate("Dialog", u"Vider les logs", None))

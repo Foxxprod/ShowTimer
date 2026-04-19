@@ -324,7 +324,8 @@ class OperatorDialog(QDialog):
         self.update_buttons_state("stopped")  # état initial
         self.config_timeline()
 
-        self.load_osc_active_in_ui() #met a jour la case a cocher de l'osc et les deux label 
+        self.load_osc_active_in_ui() #met a jour la case a cocher de l'osc et les deux label
+        self.load_osc_rtz_in_ui() #met a jour la case du statut RTZ au lancement  
         self.load_data_in_ui() #affiche le nom, la desc et le temp du show dans l'ui
 
         
@@ -348,6 +349,7 @@ class OperatorDialog(QDialog):
 
         ############BARRE DE FONCTIONS - MENU OSC########
         self.ui.osc_active.toggled.connect(self.change_osc_activ_state) #activer / desactiver l'osc
+        self.ui.osc_rtz.toggled.connect(self.change_osc_rtz_state)
         self.ui.osc_config.clicked.connect(self.change_osc_config) #quand on clique sur le menu de configuration OSC, on affiche la fenetre de configuration OSC, quand fermé, mise a jour de l'ui
         self.ui.osc_ping.clicked.connect(self.test_osc)
 
@@ -508,6 +510,19 @@ class OperatorDialog(QDialog):
         
         self.ui.osc_server_ip.setText(osc_ip)
         self.ui.osc_server_port.setValue(int(osc_port))
+
+    ########################ACTIVATION OU NON DU RETOUR A 0 OSC##########################
+    def change_osc_rtz_state(self, state): #changement du statut RTZ de l'osc
+        state = self.ui.osc_rtz.isChecked()
+
+        database.db.SetOSCreturntozero(state)
+
+
+    def load_osc_rtz_in_ui(self): #charger la case a coher du statut RTZ de l'osc
+        state = database.db.GetOSCreturntozero()
+
+        self.ui.osc_rtz.setChecked(state)
+
 
     def change_osc_config(self):
         if utils.ModifyOSCConfigDialog().exec():

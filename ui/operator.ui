@@ -492,7 +492,7 @@ QFrame[frameShape=&quot;5&quot;] {
 </string>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="fichier">
     <attribute name="title">
@@ -1454,6 +1454,19 @@ QFrame[frameShape=&quot;5&quot;] {
      </property>
      <property name="text">
       <string>Test OSC</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="osc_rtz">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>221</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Retour a zero de l'arg OSC</string>
      </property>
     </widget>
    </widget>

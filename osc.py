@@ -34,6 +34,8 @@ class OSCClient:
         if self.client is None:
             raise ConnectionError("Le client n'est pas connecté")
         self.client.send_message(address, list(args))
+        if database.db.GetOSCreturntozero():
+             self.client.send_message(address, 0)
         print(f"Message envoyé → {address} : {args}")
 
 
