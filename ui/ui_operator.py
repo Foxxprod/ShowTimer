@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'operatorQdbOwl.ui'
+## Form generated from reading UI file 'operatorEFcFDH.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.9.0
 ##
@@ -27,7 +27,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
-        Dialog.resize(1279, 862)
+        Dialog.resize(1279, 892)
         Dialog.setStyleSheet(u"/* ============================================================\n"
 "   GLOBAL QSS \u2014 TIMER PCP \u2014 Modern Dark Theme\n"
 "   ============================================================ */\n"
@@ -311,38 +311,38 @@ class Ui_Dialog(object):
 "")
         self.groupBox = QGroupBox(Dialog)
         self.groupBox.setObjectName(u"groupBox")
-        self.groupBox.setGeometry(QRect(870, 480, 401, 271))
+        self.groupBox.setGeometry(QRect(870, 480, 401, 311))
         self.prompt_textedit = QTextEdit(self.groupBox)
         self.prompt_textedit.setObjectName(u"prompt_textedit")
-        self.prompt_textedit.setGeometry(QRect(10, 20, 381, 191))
+        self.prompt_textedit.setGeometry(QRect(10, 20, 381, 231))
         font = QFont()
         font.setFamilies([u"Segoe UI"])
         self.prompt_textedit.setFont(font)
         self.prompt_clear = QToolButton(self.groupBox)
         self.prompt_clear.setObjectName(u"prompt_clear")
-        self.prompt_clear.setGeometry(QRect(10, 220, 161, 41))
+        self.prompt_clear.setGeometry(QRect(10, 260, 161, 41))
         icon = QIcon()
         icon.addFile(u"icon/32x32_trash.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.prompt_clear.setIcon(icon)
         self.prompt_clear.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         self.prompt_highlight = QToolButton(self.groupBox)
         self.prompt_highlight.setObjectName(u"prompt_highlight")
-        self.prompt_highlight.setGeometry(QRect(240, 220, 151, 41))
+        self.prompt_highlight.setGeometry(QRect(240, 260, 151, 41))
         icon1 = QIcon()
         icon1.addFile(u"icon/32x32_alert.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.prompt_highlight.setIcon(icon1)
         self.prompt_highlight.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         self.line = QFrame(Dialog)
         self.line.setObjectName(u"line")
-        self.line.setGeometry(QRect(850, 130, 20, 611))
+        self.line.setGeometry(QRect(850, 130, 20, 671))
         self.line.setFrameShape(QFrame.Shape.VLine)
         self.line.setFrameShadow(QFrame.Shadow.Sunken)
         self.groupBox_3 = QGroupBox(Dialog)
         self.groupBox_3.setObjectName(u"groupBox_3")
-        self.groupBox_3.setGeometry(QRect(10, 680, 831, 71))
+        self.groupBox_3.setGeometry(QRect(10, 680, 831, 111))
         self.logs_text = QTextEdit(self.groupBox_3)
         self.logs_text.setObjectName(u"logs_text")
-        self.logs_text.setGeometry(QRect(10, 20, 811, 41))
+        self.logs_text.setGeometry(QRect(10, 20, 811, 81))
         self.logs_text.setFont(font)
         self.tabWidget = QTabWidget(Dialog)
         self.tabWidget.setObjectName(u"tabWidget")
@@ -591,7 +591,7 @@ class Ui_Dialog(object):
         self.tab_2.setObjectName(u"tab_2")
         self.formLayoutWidget = QWidget(self.tab_2)
         self.formLayoutWidget.setObjectName(u"formLayoutWidget")
-        self.formLayoutWidget.setGeometry(QRect(10, 10, 401, 68))
+        self.formLayoutWidget.setGeometry(QRect(10, 10, 401, 51))
         self.formLayout = QFormLayout(self.formLayoutWidget)
         self.formLayout.setObjectName(u"formLayout")
         self.formLayout.setContentsMargins(0, 0, 0, 0)
@@ -702,7 +702,7 @@ class Ui_Dialog(object):
         self.line_4.setFrameShadow(QFrame.Shadow.Sunken)
         self.formLayoutWidget_2 = QWidget(self.tab_4)
         self.formLayoutWidget_2.setObjectName(u"formLayoutWidget_2")
-        self.formLayoutWidget_2.setGeometry(QRect(250, 10, 221, 68))
+        self.formLayoutWidget_2.setGeometry(QRect(250, 10, 221, 51))
         self.formLayout_2 = QFormLayout(self.formLayoutWidget_2)
         self.formLayout_2.setObjectName(u"formLayout_2")
         self.formLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -981,7 +981,7 @@ class Ui_Dialog(object):
         self.zoom_spin.setMaximum(1000)
         self.groupBox_6 = QGroupBox(Dialog)
         self.groupBox_6.setObjectName(u"groupBox_6")
-        self.groupBox_6.setGeometry(QRect(10, 750, 1261, 101))
+        self.groupBox_6.setGeometry(QRect(10, 790, 1261, 101))
         self.TIMELINE = QWidget(self.groupBox_6)
         self.TIMELINE.setObjectName(u"TIMELINE")
         self.TIMELINE.setGeometry(QRect(10, 30, 1241, 61))
@@ -997,7 +997,7 @@ class Ui_Dialog(object):
 
         self.retranslateUi(Dialog)
 
-        self.tabWidget.setCurrentIndex(3)
+        self.tabWidget.setCurrentIndex(4)
 
 
         QMetaObject.connectSlotsByName(Dialog)

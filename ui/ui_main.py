@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'mainbCTUhC.ui'
+## Form generated from reading UI file 'mainCfwGjs.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.9.0
 ##
@@ -462,7 +462,7 @@ class Ui_MainWindow(object):
         self.show_import.setText(QCoreApplication.translate("MainWindow", u"Importer un show", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"SHOW TIMER V1", None))
         self.pushButton.setText("")
-        self.label_2.setText(QCoreApplication.translate("MainWindow", u"\u00a9 FoxxProd 2026 - ShowTimer 1.0", None))
+        self.label_2.setText(QCoreApplication.translate("MainWindow", u"\u00a9 FoxxProd 2026 - ShowTimer 1.1", None))
         self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"Selectionnez une emission a ouvrir / modifier / supprimer", None))
         self.open_show.setText(QCoreApplication.translate("MainWindow", u"OUVRIR", None))
         self.add_show.setText(QCoreApplication.translate("MainWindow", u"CREER NOUVEAU", None))

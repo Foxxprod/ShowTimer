@@ -1,8 +1,8 @@
 #define MyAppName "ShowTimer"
-#define MyAppVersion "1.0"
+#define MyAppVersion "1.1"
 #define MyAppPublisher "Foxx Production"
 #define MyAppURL "https://www.foxxprod.fr/"
-#define MyAppExeName "ShowTimer_1.0.exe"
+#define MyAppExeName "ShowTimer_1.1.exe"
 
 [Setup]
 AppId={{7B5008C8-D46B-40FE-934B-BE4CE4DB3605}
@@ -21,7 +21,7 @@ DisableProgramGroupPage=no
 LicenseFile=C:\Users\Perso-PC\Documents\GitHub\TIMER_PCP\LICENSE.txt
 PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=C:\Users\Perso-PC\Documents\GitHub\TIMER_PCP\installer
-OutputBaseFilename=ShowTimer_1.0_setup
+OutputBaseFilename=ShowTimer_1.1_setup
 SetupIconFile=C:\Users\Perso-PC\Documents\GitHub\TIMER_PCP\icon\icon.ico
 SolidCompression=yes
 WizardStyle=modern

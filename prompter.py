@@ -30,7 +30,6 @@ class PrompterWindow(QWidget):
 
         self._setup_custom_labels() #remplace les widget vide par les custom avec lignes de contour
         self._connecter_signaux() #connecte les signauc pour recevoir les infos du timer
-        self._reset_affichage() #remet a zero l'affichage
 
         for widget in self.findChildren(QWidget):
             widget.setContextMenuPolicy(Qt.NoContextMenu)
@@ -55,7 +54,7 @@ class PrompterWindow(QWidget):
         self.cue_blink_mode = None   # None | "first" | "second" | "third"
         self.cue_blink_color = QColor("white")
 
-        # Valeurs de config chargées depuis la BDD à chaque ouverture, ca c'est des val par defaut 
+        # Valeurs de config chargées depuis la BDD à chaque ouverture, ca c'est des val par defaut
         self.cfg_blink_first_time  = 20000
         self.cfg_blink_second_time = 10000
         self.cfg_blink_third_time  = 5000
@@ -63,6 +62,8 @@ class PrompterWindow(QWidget):
         self.cfg_blink_second_color = QColor("#FF8800")
         self.cfg_blink_third_color  = QColor("#FF0000")
         self.cfg_next_cue_base_color = QColor("white")
+
+        self._reset_affichage() #remet a zero l'affichage
 
     ######################CHARGEMENT CONFIG BDD##############################
 
@@ -196,6 +197,10 @@ class PrompterWindow(QWidget):
         self.timer.two_next_cues.connect(self.on_two_next_cues)
 
     def _reset_affichage(self): #remet a zero l'affichage
+        self.cue_blink_timer.stop()
+        self.cue_blink_mode = None
+        self.cue_blink_state = False
+        self.next_cue_label.set_color(self.cfg_next_cue_base_color)
         self.next_cue_label.set_text("")
         self.second_cue_label.set_text("")
         self.clock_label.set_text("")

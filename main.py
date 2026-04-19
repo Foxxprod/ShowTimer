@@ -33,7 +33,7 @@ from prompter import PrompterWindow
 from utils import PrompterSettingsDialog, export_show_to_pdf
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit, QTextEdit, QHBoxLayout, QGridLayout, QMessageBox, QDialog
-from PySide6.QtGui import QStandardItemModel, QStandardItem
+from PySide6.QtGui import QStandardItemModel, QStandardItem, QColor
 from PySide6.QtCore import Qt, QTimer, QTime
 from PySide6.QtGui import QShortcut, QKeySequence
 from PySide6.QtGui import QIcon
@@ -55,6 +55,9 @@ class MainWindow(QMainWindow):
         
         
         self.selected_show_id = None
+        self.ui.open_show.setEnabled(False)
+        self.ui.modify_show.setEnabled(False)
+        self.ui.delete_show.setEnabled(False)
 
         ######BARRE DE MENUS######
         self.ui.actionConfig_OSC.triggered.connect(self.change_osc_config) #quand on clique sur le menu de configuration OSC, on affiche la fenetre de configuration OSC
@@ -74,6 +77,12 @@ class MainWindow(QMainWindow):
         self.ui.show_table_view.doubleClicked.connect(self.open_show)
         self.ui.show_table_view.setContextMenuPolicy(Qt.CustomContextMenu)
         self.ui.show_table_view.customContextMenuRequested.connect(self.show_table_context_menu)
+        self.ui.show_table_view.setStyleSheet("""
+            QTableView::item:selected {
+                background-color: #0078d4;
+                color: white;
+            }
+        """)
 
     def _import_stshow(self, path=None):
         import xml.etree.ElementTree as ET
@@ -148,13 +157,19 @@ class MainWindow(QMainWindow):
 
     def show_table_context_menu(self, pos):
         from PySide6.QtWidgets import QMenu
-        if not self.ui.show_table_view.indexAt(pos).isValid():
-            return
         menu = QMenu(self)
-        menu.addAction("Ouvrir", self.open_show)
-        menu.addAction("Modifier", self.modify_show)
-        menu.addSeparator()
-        menu.addAction("Supprimer", self.delete_show)
+        menu.setStyleSheet("QMenu::item { margin-left: 10px; padding: 4px 16px 4px 4px; }")
+
+        if self.ui.show_table_view.indexAt(pos).isValid():
+            menu.addAction(QIcon("icon/32x32_ok.png"), "Ouvrir", self.open_show)
+            menu.addAction(QIcon("icon/32x32_configuration.png"), "Modifier", self.modify_show)
+            menu.addSeparator()
+            menu.addAction(QIcon("icon/32x32_close.png"), "Supprimer", self.delete_show)
+            menu.addSeparator()
+
+        menu.addAction(QIcon("icon/32x32_plus.png"), "Créer nouveau", self.create_show)
+        menu.addAction(QIcon("icon/32x32_import.png"), "Importer", self._import_stshow)
+
         menu.exec(self.ui.show_table_view.viewport().mapToGlobal(pos))
 
     def update_shows_table(self):
@@ -203,6 +218,10 @@ class MainWindow(QMainWindow):
     def on_show_selected(self): #a chaques clique sur une ligne du tableau, l'id de l'emmision est sauvegardé.
         indexes = self.ui.show_table_view.selectedIndexes()
         if not indexes:
+            self.selected_show_id = None
+            self.ui.open_show.setEnabled(False)
+            self.ui.modify_show.setEnabled(False)
+            self.ui.delete_show.setEnabled(False)
             return
 
         model = self.ui.show_table_view.model()
@@ -212,6 +231,9 @@ class MainWindow(QMainWindow):
         id_col_index = col_names.index("id")
 
         self.selected_show_id = model.item(selected_row, id_col_index).text()
+        self.ui.open_show.setEnabled(True)
+        self.ui.modify_show.setEnabled(True)
+        self.ui.delete_show.setEnabled(True)
         print(f"Emmission sélectionné - ID : {self.selected_show_id}")
     
     def delete_show(self): #fonction appelé quand on clique sur le bouton de suppression d'une emmsion.
@@ -220,7 +242,7 @@ class MainWindow(QMainWindow):
             return
         reply = QMessageBox.question(
         self,
-        "Tu confirme chef ?",
+        "Confirmer la suppression ?",
         f"Voulez-vous vraiment supprimer l'emmission avec l'id {self.selected_show_id} ?",
         QMessageBox.Yes | QMessageBox.No,
         QMessageBox.No
@@ -548,15 +570,17 @@ class OperatorDialog(QDialog):
     def cue_table_context_menu(self, pos):
         from PySide6.QtWidgets import QMenu
         menu = QMenu(self)
-        menu.addAction("Ajouter un cue", self.add_cue_function)
+        menu.setStyleSheet("QMenu::item { margin-left: 10px; padding: 4px 16px 4px 4px; }")
 
         if self.ui.cue_table_widget.indexAt(pos).isValid() and self.selected_cue_id is not None:
+            menu.addAction(QIcon("icon/32x32_antenna.png"), "Déclencher OSC manuellement", self.fire_cue_osc_manually)
             menu.addSeparator()
-            menu.addAction("Modifier", self.modify_cue_function)
+            menu.addAction(QIcon("icon/32x32_configuration.png"), "Modifier", self.modify_cue_function)
             menu.addSeparator()
-            menu.addAction("Déclencher OSC manuellement", self.fire_cue_osc_manually)
+            menu.addAction(QIcon("icon/32x32_trash.png"), "Supprimer", self.delete_cue_function)
             menu.addSeparator()
-            menu.addAction("Supprimer", self.delete_cue_function)
+
+        menu.addAction(QIcon("icon/32x32_plus.png"), "Ajouter un cue", self.add_cue_function)
 
         menu.exec(self.ui.cue_table_widget.viewport().mapToGlobal(pos))
 
@@ -601,10 +625,12 @@ class OperatorDialog(QDialog):
             QMessageBox.warning(self, "Aucun cue sélectionné", "Veuillez sélectionner un cue à supprimer.")
             return
 
+        cue = database.db.GetCueById(self.selected_cue_id)
+        cue_nom = cue["nom"] if cue else "?"
         reply = QMessageBox.question(
             self,
             "Confirmer la suppression",
-            f"Voulez-vous vraiment supprimer le cue avec l'id {self.selected_cue_id} ?",
+            f"Voulez-vous vraiment supprimer le cue \"{cue_nom}\" (id {self.selected_cue_id}) ?",
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No
         )
@@ -737,7 +763,6 @@ class OperatorDialog(QDialog):
 
     def fill_table(self):
         from PySide6.QtWidgets import QTableWidgetItem
-        from PySide6.QtGui import QColor
 
         self.ui.cue_table_widget.setRowCount(0)
 
@@ -855,6 +880,13 @@ class OperatorDialog(QDialog):
         self.ui.progressBar.setValue(0)
         self.prompteur_window._reset_affichage()
 
+        self._table_blink_timer.stop()
+        if self._table_next_row >= 0:
+            self._set_row_background(self._table_next_row, QColor("#1a7a1a"))
+        self._table_blink_mode  = None
+        self._table_blink_state = False
+        self._table_next_row    = -1
+
         show_id = database.db.GetActiveShow()
         if show_id is not None:
             cues = database.db.GetAllCuesFromShow(show_id) or []
@@ -865,7 +897,6 @@ class OperatorDialog(QDialog):
     #######################TIMER############################################3
 
     def on_timer_updated(self, temps_ms):
-        from PySide6.QtGui import QColor
 
         seconde_actuelle = temps_ms // 1000
 
@@ -939,7 +970,6 @@ class OperatorDialog(QDialog):
                     self._set_row_background(self._table_next_row, QColor("#1a7a1a"))
 
     def on_cue_fired(self, cue):
-        from PySide6.QtGui import QColor
 
         for ligne in range(self.ui.cue_table_widget.rowCount()):
             item_nom = self.ui.cue_table_widget.item(ligne, 0)
@@ -956,7 +986,6 @@ class OperatorDialog(QDialog):
         logger.info(f"CUE déclenché : '{cue['nom']}' à {cue['temps']}ms  |  OSC: {cue.get('osc_url','')} {cue.get('osc_args','')}")
 
     def on_next_cue(self, cues):
-        from PySide6.QtGui import QColor
 
         new_ids = [c["cue_id"] for c in cues]
         old_ids = [c["cue_id"] for c in self.last_next_cues]
@@ -1028,7 +1057,6 @@ class OperatorDialog(QDialog):
                     item.setBackground(color)
 
     def _on_table_blink_tick(self):
-        from PySide6.QtGui import QColor
         if self._table_next_row < 0:
             return
         self._table_blink_state = not self._table_blink_state
@@ -1288,6 +1316,7 @@ class OperatorDialog(QDialog):
         logs_dir = logger.get_logs_dir()
         os.makedirs(logs_dir, exist_ok=True)
         os.startfile(logs_dir)
+        logger.info("Dossier des logs ouvert par l'utilisateur.")
 
     def _delete_logs(self):
         """Supprime tous les fichiers de logs après confirmation."""
@@ -1339,6 +1368,7 @@ class OperatorDialog(QDialog):
         dialog.exec()
 
         overlay.deleteLater()
+        logger.info("L'interface opérateur est verrouillée.")
 
     def closeEvent(self, event):
         reponse = QMessageBox.question(
@@ -1358,7 +1388,9 @@ class OperatorDialog(QDialog):
                 if isinstance(widget, MainWindow):
                     widget.show()
                     break
+            logger.info("Interface opérateur fermée.")
             event.accept()
+
         else:
             event.ignore()
     
